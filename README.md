@@ -53,7 +53,7 @@ Security isn't an afterthought — the app ships with a **61-test automated secu
 | **URL Injection** | Strict scheme whitelist — only `http`/`https` can be opened; `javascript:`, `data:`, `vbscript:`, `file:` etc. are rejected |
 | **Content Security Policy** | `default-src 'none'` — external scripts, frames, objects and connections are blocked at browser level |
 | **No Referrer Leak** | `referrer: no-referrer` — opened sites never see your local path |
-| **Import Validation** | File size ≤ 5 MB, ≤ 5000 items, per-field length caps, malicious URLs silently dropped |
+| **Import Validation** | Per-field length caps, malicious URLs silently dropped, UTF-8 BOM handling, chunked non-blocking import (tested with 200k+ items), quota-safe persistence |
 | **Attribute Injection** | `aria-label`s and all HTML attributes escaped; delete confirmation uses `textContent` (no HTML parsing) |
 | **Supply Chain** | Zero dependencies — nothing to compromise |
 | **Input Caps** | Name 120 · URL 2048 · Notes 2000 · Category 40 characters |

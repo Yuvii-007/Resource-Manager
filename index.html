@@ -511,7 +511,18 @@ function load(){
   try{ const d = JSON.parse(localStorage.getItem(STORE_KEY)); return Array.isArray(d) ? d : []; }
   catch(e){ return []; }
 }
-function persist(){ localStorage.setItem(STORE_KEY, JSON.stringify(resources)); }
+let quotaWarned = false;
+function persist(){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(resources));
+    quotaWarned = false;
+  }catch(err){
+    if(!quotaWarned){
+      quotaWarned = true;
+      toast("Browser storage is full — data is loaded but won't persist after refresh. Export a backup!", true);
+    }
+  }
+}
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 function normalizeUrl(u){
   u = (u||"").trim().slice(0,2048);
@@ -697,7 +708,15 @@ function render(){
     grid.appendChild(empty);
     requestAnimationFrame(() => empty.classList.add("show"));
   } else {
-    list.forEach((r,i) => grid.appendChild(cardEl(r,i)));
+    let idx = 0;
+    const total = list.length;
+    (function addChunk(){
+      const frag = document.createDocumentFragment();
+      const end = Math.min(idx + 60, total);
+      for(; idx < end; idx++) frag.appendChild(cardEl(list[idx], idx));
+      grid.appendChild(frag);
+      if(idx < total) requestAnimationFrame(addChunk);
+    })();
   }
 
   requestAnimationFrame(revealInView);
@@ -878,17 +897,39 @@ $("#importBtn").addEventListener("click", () => $("#fileInput").click());
 $("#fileInput").addEventListener("change", e => {
   const file = e.target.files[0];
   if(!file) return;
-  if(file.size > 5*1024*1024){ toast("File too large — max 5 MB", true); e.target.value = ""; return; }
   const reader = new FileReader();
+  reader.onerror = () => { toast("Could not read the file", true); e.target.value = ""; };
   reader.onload = () => {
+    let data;
     try{
-      const data = JSON.parse(reader.result);
-      if(!Array.isArray(data)) throw 0;
-      let added = 0;
-      for(const item of data.slice(0,5000)){
+      data = JSON.parse(String(reader.result).replace(/^\uFEFF/, ""));
+    }catch(err){
+      toast("Invalid JSON file", true);
+      e.target.value = "";
+      return;
+    }
+    if(!Array.isArray(data)){
+      toast("Invalid format — JSON must be an array", true);
+      e.target.value = "";
+      return;
+    }
+    if(data.length === 0){
+      toast("File is empty — nothing to import", true);
+      e.target.value = "";
+      return;
+    }
+
+    let added = 0, skipped = 0, i = 0;
+    const BATCH = 2500;
+    toast(`Importing ${data.length.toLocaleString()} items...`);
+
+    (function chunk(){
+      const end = Math.min(i + BATCH, data.length);
+      for(; i < end; i++){
+        const item = data[i];
         const url = item ? normalizeUrl(String(item.url ?? "")) : "";
         const name = String(item?.name ?? "").trim().slice(0,120);
-        if(!name || !url) continue;
+        if(!name || !url){ skipped++; continue; }
         resources.push({
           id: uid(),
           name,
@@ -899,12 +940,17 @@ $("#fileInput").addEventListener("change", e => {
         });
         added++;
       }
-      persist(); render();
-      toast(`${added} resources imported`);
-    }catch(err){ toast("Invalid JSON file", true); }
+      if(i < data.length){
+        setTimeout(chunk, 0);
+      }else{
+        persist();
+        render();
+        toast(`${added.toLocaleString()} imported${skipped ? `, ${skipped.toLocaleString()} skipped` : ""}`);
+        e.target.value = "";
+      }
+    })();
   };
   reader.readAsText(file);
-  e.target.value = "";
 });
 
 /* ---------- shortcuts / misc ---------- */
@@ -912,7 +958,11 @@ $("#addBtnNav").addEventListener("click", () => openForm());
 $("#addBtnHero").addEventListener("click", () => openForm());
 window.openForm = openForm;
 
-searchInput.addEventListener("input", render);
+let searchTimer;
+searchInput.addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(render, 140);
+});
 addEventListener("keydown", e => {
   if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
     e.preventDefault(); searchInput.focus(); searchInput.select();

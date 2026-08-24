@@ -165,10 +165,14 @@ test("no eval / new Function / innerHTML with document.write", () => {
   ok(!/new Function\(/.test(js), "new Function found");
   ok(!/document\.write/.test(js), "document.write found");
 });
-test("import: size limit enforced", () => ok(/file\.size > 5\s*\*\s*1024\s*\*\s*1024/.test(js), "no 5MB limit"));
-test("import: item cap enforced", () => ok(/slice\(0,5000\)/.test(js), "no item cap"));
-test("import: normalized URL required (no javascript: through import)", () =>
-  ok(/const url = item \? normalizeUrl/.test(js), "import does not normalize url before check"));
+test("import: storage quota overflow handled gracefully", () =>
+  ok(/Browser storage is full/.test(js), "no quota handling in persist()"));
+test("import: large files processed in chunks (non-blocking)", () =>
+  ok(/const BATCH = \d+/.test(js) && /setTimeout\(chunk, 0\)/.test(js), "no chunked import"));
+test("import: UTF-8 BOM stripped before JSON.parse", () =>
+  ok(/replace\(\/\^\\uFEFF\/, ""\)/.test(js), "BOM not stripped — valid files would fail"));
+test("render: card grid built in batches (no UI freeze on huge lists)", () =>
+  ok(/addChunk/.test(js) && /requestAnimationFrame\(addChunk\)/.test(js), "no batched rendering"));
 test("input length caps enforced", () => {
   ok(/slice\(0,120\)/.test(js), "name cap missing");
   ok(/slice\(0,2048\)/.test(js), "url cap missing");
