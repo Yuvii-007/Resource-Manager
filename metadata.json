@@ -1,0 +1,8 @@
+{
+  "name": "Resource Manager",
+  "description": "A beautiful, secure, offline-first personal web vault to save every important website with its name, category and notes, and find it again with a single search.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

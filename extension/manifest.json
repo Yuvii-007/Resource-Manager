@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Resource Manager — Instant Vault Capture",
+  "version": "1.0.0",
+  "description": "One-click bookmark capture with auto-detection of title, URL, selection notes, categories and tags.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "contextMenus"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Save to Resource Manager"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "save-bookmark": {
+      "suggested_key": {
+        "default": "Alt+Shift+S",
+        "mac": "Alt+Shift+S"
+      },
+      "description": "Quickly save current tab"
+    }
+  }
+}

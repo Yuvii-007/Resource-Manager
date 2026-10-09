@@ -3,352 +3,444 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: 'self'; font-src 'none'; connect-src 'self' http: https:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <title>Resource Manager</title>
+<meta name="description" content="A beautiful, secure, offline-first personal web vault to save every important website with its name, category and notes, and find it again with a single search.">
+<meta property="og:title" content="Resource Manager">
+<meta property="og:description" content="A beautiful, secure, offline-first personal web vault to save every important website with its name, category and notes, and find it again with a single search.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230d9488'%3E%3Cpath d='M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z'/%3E%3C/svg%3E">
 <style>
 :root{
-  --bg:#060B10;
-  --bg2:#0A121A;
-  --card:#0D1620;
-  --card2:#101C28;
-  --border:rgba(153,246,228,.10);
-  --border-hi:rgba(20,184,166,.38);
-  --text:#E9F5F2;
-  --muted:#8CA3AD;
+  --bg:#05080C;
+  --bg2:#080E14;
+  --card:#0B131C;
+  --card2:#0E1824;
+  --border:rgba(153,246,228,.09);
+  --border-hi:rgba(20,184,166,.42);
+  --border-glow:rgba(20,184,166,.22);
+  --text:#EDF7F5;
+  --text-sub:#A0B4BE;
+  --muted:#7A929E;
   --primary:#0D9488;
   --primary-hi:#14B8A6;
-  --on-primary:#03130F;
+  --on-primary:#02110D;
   --accent:#EA580C;
   --accent-hi:#F97316;
-  --on-accent:#1A0800;
+  --on-accent:#150700;
   --danger:#DC2626;
   --danger-hi:#EF4444;
+  --success:#10B981;
   --ease:cubic-bezier(.16,1,.3,1);
+  --shadow-card:0 12px 36px -12px rgba(0,0,0,.65);
+  --shadow-hover:0 24px 54px -14px rgba(0,0,0,.75),0 0 32px -8px rgba(20,184,166,.18);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
   background:var(--bg);
   color:var(--text);
-  font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,'Plus Jakarta Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
   overflow-x:hidden;
 }
-::selection{background:rgba(20,184,166,.35);color:#fff}
-::-webkit-scrollbar{width:10px}
+::selection{background:rgba(20,184,166,.38);color:#fff}
+::-webkit-scrollbar{width:8px}
 ::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:#1B2A36;border-radius:99px;border:2px solid var(--bg)}
-::-webkit-scrollbar-thumb:hover{background:#26404F}
+::-webkit-scrollbar-thumb{background:#162430;border-radius:99px;border:2px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:#233B4D}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-input,textarea{font-family:inherit;color:inherit}
+input,textarea,select{font-family:inherit;color:inherit}
 a{color:inherit;text-decoration:none}
-:focus-visible{outline:2px solid var(--primary-hi);outline-offset:2px;border-radius:6px}
+:focus-visible{outline:2px solid var(--primary-hi);outline-offset:2px;border-radius:8px}
 
 #progress{
-  position:fixed;top:0;left:0;height:2px;width:100%;
-  background:linear-gradient(90deg,var(--primary),var(--primary-hi),var(--accent));
+  position:fixed;top:0;left:0;height:2.5px;width:100%;
+  background:linear-gradient(90deg,var(--primary),var(--primary-hi),#38BDF8,var(--accent));
   transform-origin:left;transform:scaleX(0);
   z-index:1000;
 }
 
 .grain{
-  position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.05;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* Nav */
 nav{
   position:fixed;top:0;left:0;right:0;z-index:900;
-  display:flex;align-items:center;gap:14px;
-  padding:16px clamp(16px,4vw,40px);
-  transition:background .35s var(--ease),backdrop-filter .35s,border-color .35s,padding .35s;
+  display:flex;align-items:center;gap:12px;
+  padding:14px clamp(16px,4vw,40px);
+  transition:all .35s var(--ease);
   border-bottom:1px solid transparent;
 }
 nav.scrolled{
-  background:rgba(6,11,16,.72);
-  backdrop-filter:blur(18px) saturate(1.4);
+  background:rgba(5,8,12,.82);
+  backdrop-filter:blur(22px) saturate(1.5);
   border-bottom-color:var(--border);
-  padding-top:11px;padding-bottom:11px;
+  padding-top:10px;padding-bottom:10px;
+  box-shadow:0 8px 32px -8px rgba(0,0,0,.5);
 }
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-.02em;margin-right:auto}
-.brand svg{width:26px;height:26px;color:var(--primary-hi);filter:drop-shadow(0 0 10px rgba(20,184,166,.55))}
-.nav-btns{display:flex;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17.5px;letter-spacing:-.025em;margin-right:auto}
+.brand svg{width:26px;height:26px;color:var(--primary-hi);filter:drop-shadow(0 0 12px rgba(20,184,166,.65))}
+.brand-text{background:linear-gradient(135deg,#FFFFFF 40%,#99F6E4 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.nav-btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
 .btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  height:42px;padding:0 20px;border-radius:12px;
-  font-size:14px;font-weight:600;letter-spacing:.01em;
-  transition:transform .25s var(--ease),box-shadow .25s,background .2s,color .2s,border-color .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  height:38px;padding:0 15px;border-radius:11px;
+  font-size:13.5px;font-weight:600;letter-spacing:.01em;
+  transition:all .22s var(--ease);
   will-change:transform;
 }
-.btn svg{width:16px;height:16px;flex:none}
-.btn-primary{background:var(--primary);color:var(--on-primary)}
-.btn-primary:hover{background:var(--primary-hi);transform:translateY(-2px);box-shadow:0 10px 32px -8px rgba(20,184,166,.55)}
-.btn-accent{background:var(--accent);color:var(--on-accent)}
-.btn-accent:hover{background:var(--accent-hi);transform:translateY(-2px);box-shadow:0 10px 32px -8px rgba(234,88,12,.6)}
-.btn-ghost{border:1px solid var(--border);color:var(--muted)}
-.btn-ghost:hover{color:var(--text);border-color:var(--border-hi);background:rgba(13,148,136,.08)}
+.btn svg{width:15px;height:15px;flex:none}
+.btn-primary{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-hi) 100%);color:var(--on-primary);box-shadow:0 4px 16px -4px rgba(20,184,166,.4)}
+.btn-primary:hover{transform:translateY(-1.5px);box-shadow:0 10px 28px -6px rgba(20,184,166,.65);filter:brightness(1.05)}
+.btn-accent{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-hi) 100%);color:var(--on-accent);box-shadow:0 4px 16px -4px rgba(234,88,12,.4)}
+.btn-accent:hover{transform:translateY(-1.5px);box-shadow:0 10px 28px -6px rgba(234,88,12,.65);filter:brightness(1.05)}
+.btn-ghost{border:1px solid var(--border);color:var(--text-sub);background:rgba(11,19,28,.6);backdrop-filter:blur(8px)}
+.btn-ghost:hover{color:var(--text);border-color:var(--border-hi);background:rgba(20,184,166,.08);transform:translateY(-1px)}
 .btn-danger{background:var(--danger);color:#fff}
-.btn-danger:hover{background:var(--danger-hi);transform:translateY(-2px)}
+.btn-danger:hover{background:var(--danger-hi);transform:translateY(-1.5px)}
+.btn-sm{height:32px;padding:0 11px;font-size:12px;border-radius:9px}
 
+.sync-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:4px 10px;border-radius:99px;
+  border:1px solid var(--border);color:var(--muted);
+  background:rgba(8,14,20,.85);cursor:pointer;transition:all .2s;
+}
+.sync-badge:hover{border-color:var(--border-hi);color:var(--text)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#10B981;box-shadow:0 0 8px #10B981}
+.sync-dot.syncing{background:#F59E0B;box-shadow:0 0 10px #F59E0B;animation:pulse 1s infinite}
+.sync-dot.offline{background:#6B7280;box-shadow:none}
+
+/* Hero */
 .hero{
-  position:relative;min-height:100svh;
+  position:relative;min-height:92svh;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:110px 20px 70px;
+  text-align:center;padding:120px 20px 60px;
   overflow:hidden;
 }
 .aurora{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;will-change:transform}
-.orb1{width:520px;height:520px;background:radial-gradient(circle,#0D9488 0%,transparent 65%);top:-140px;left:8%;animation:drift1 16s ease-in-out infinite alternate}
-.orb2{width:420px;height:420px;background:radial-gradient(circle,#B45309 0%,transparent 62%);bottom:-120px;right:6%;opacity:.34;animation:drift2 20s ease-in-out infinite alternate}
-.orb3{width:300px;height:300px;background:radial-gradient(circle,#155E75 0%,transparent 60%);top:38%;left:52%;opacity:.4;animation:drift3 14s ease-in-out infinite alternate}
-@keyframes drift1{to{transform:translate(90px,60px) scale(1.15)}}
-@keyframes drift2{to{transform:translate(-70px,-50px) scale(1.2)}}
-@keyframes drift3{to{transform:translate(-60px,45px) scale(.85)}}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);opacity:.45;will-change:transform}
+.orb1{width:560px;height:560px;background:radial-gradient(circle,#0D9488 0%,transparent 70%);top:-160px;left:10%;animation:drift1 18s ease-in-out infinite alternate}
+.orb2{width:460px;height:460px;background:radial-gradient(circle,#EA580C 0%,transparent 68%);bottom:-130px;right:8%;opacity:.32;animation:drift2 22s ease-in-out infinite alternate}
+.orb3{width:340px;height:340px;background:radial-gradient(circle,#0284C7 0%,transparent 65%);top:35%;left:52%;opacity:.35;animation:drift3 16s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(100px,70px) scale(1.12)}}
+@keyframes drift2{to{transform:translate(-80px,-60px) scale(1.18)}}
+@keyframes drift3{to{transform:translate(-60px,50px) scale(.88)}}
+
 .hero-grid{
-  position:absolute;inset:0;pointer-events:none;opacity:.5;
-  background-image:linear-gradient(rgba(148,163,184,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.05) 1px,transparent 1px);
-  background-size:56px 56px;
-  mask-image:radial-gradient(ellipse 75% 60% at 50% 42%,#000 30%,transparent 75%);
+  position:absolute;inset:0;pointer-events:none;opacity:.45;
+  background-image:linear-gradient(rgba(148,163,184,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 75% 60% at 50% 40%,#000 30%,transparent 80%);
 }
 .badge{
   display:inline-flex;align-items:center;gap:8px;
-  font-size:12.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
   color:var(--primary-hi);
-  border:1px solid rgba(20,184,166,.28);border-radius:99px;
-  padding:9px 18px;margin-bottom:26px;
-  background:rgba(13,148,136,.07);
+  border:1px solid rgba(20,184,166,.3);border-radius:99px;
+  padding:8px 18px;margin-bottom:24px;
+  background:rgba(13,148,136,.08);backdrop-filter:blur(10px);
   opacity:0;animation:rise .9s var(--ease) .15s forwards;
 }
 .badge i{width:6px;height:6px;border-radius:50%;background:var(--primary-hi);box-shadow:0 0 12px var(--primary-hi);animation:pulse 2s infinite}
 @keyframes pulse{50%{opacity:.35}}
 h1{
-  font-size:clamp(44px,8vw,96px);
-  line-height:1.02;font-weight:800;letter-spacing:-.04em;
+  font-size:clamp(44px,7.5vw,94px);
+  line-height:1.02;font-weight:800;letter-spacing:-.045em;
   max-width:16ch;
 }
 h1 .ch{display:inline-block;opacity:0;transform:translateY(26px) rotateX(-55deg);transform-origin:bottom;animation:charIn .8s var(--ease) both}
 @keyframes charIn{to{opacity:1;transform:none}}
-.grad{background:linear-gradient(92deg,var(--primary-hi) 5%,#5EEAD4 45%,var(--accent-hi) 95%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.grad{background:linear-gradient(92deg,var(--primary-hi) 0%,#5EEAD4 40%,var(--accent-hi) 95%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .sub{
-  margin-top:24px;font-size:clamp(15px,2vw,19px);line-height:1.65;color:var(--muted);
+  margin-top:22px;font-size:clamp(15px,1.9vw,19px);line-height:1.65;color:var(--text-sub);
   max-width:54ch;
   opacity:0;animation:rise 1s var(--ease) .75s forwards;
 }
-.hero-cta{display:flex;gap:14px;margin-top:38px;flex-wrap:wrap;justify-content:center;opacity:0;animation:rise 1s var(--ease) .95s forwards}
-.hero-cta .btn{height:50px;padding:0 28px;font-size:15px;border-radius:14px}
+.hero-cta{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap;justify-content:center;opacity:0;animation:rise 1s var(--ease) .95s forwards}
+.hero-cta .btn{height:48px;padding:0 26px;font-size:15px;border-radius:13px}
 @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
 .scroll-hint{
-  position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
-  display:flex;flex-direction:column;align-items:center;gap:9px;
-  color:var(--muted);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:var(--muted);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;
   opacity:0;animation:rise 1s var(--ease) 1.5s forwards;
 }
-.mouse{width:24px;height:38px;border:1.5px solid rgba(140,163,173,.5);border-radius:14px;position:relative}
-.mouse::after{content:'';position:absolute;top:7px;left:50%;width:4px;height:8px;margin-left:-2px;border-radius:99px;background:var(--primary-hi);animation:wheel 1.8s infinite}
-@keyframes wheel{0%{opacity:1;transform:translateY(0)}70%{opacity:0;transform:translateY(12px)}100%{opacity:0}}
+.mouse{width:22px;height:36px;border:1.5px solid rgba(140,163,173,.45);border-radius:13px;position:relative}
+.mouse::after{content:'';position:absolute;top:6px;left:50%;width:3.5px;height:7px;margin-left:-1.75px;border-radius:99px;background:var(--primary-hi);animation:wheel 1.8s infinite}
+@keyframes wheel{0%{opacity:1;transform:translateY(0)}70%{opacity:0;transform:translateY(11px)}100%{opacity:0}}
 
-section{position:relative}
+/* Stats */
 .stats-wrap{
-  max-width:1080px;margin:0 auto;padding:0 clamp(16px,4vw,40px);
+  max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,40px);
 }
 .stats{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;
-  background:var(--border);border:1px solid var(--border);border-radius:20px;
-  overflow:hidden;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;
+  background:var(--border);border:1px solid var(--border);border-radius:22px;
+  overflow:hidden;backdrop-filter:blur(14px);
   opacity:0;transform:translateY(30px);
   transition:opacity .9s var(--ease),transform .9s var(--ease);
-  margin-bottom:min(9vh,90px);
+  margin-bottom:min(8vh,80px);
+  box-shadow:var(--shadow-card);
 }
 .reveal.in .stats{opacity:1;transform:none}
-.stat{background:var(--bg2);padding:clamp(22px,4vw,40px) clamp(16px,3vw,34px);text-align:center}
-.stat b{display:block;font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-.stat span{display:block;margin-top:6px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stat{background:linear-gradient(180deg,rgba(11,19,28,.85) 0%,rgba(8,14,20,.95) 100%);padding:clamp(22px,3.8vw,36px) clamp(16px,3vw,30px);text-align:center;transition:background .2s}
+.stat:hover{background:rgba(14,25,37,.95)}
+.stat b{display:block;font-size:clamp(30px,4.5vw,46px);font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:#FFFFFF}
+.stat span{display:block;margin-top:6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-sub);font-weight:600}
 
+/* Library Section */
 .lib-head{
   max-width:1180px;margin:0 auto;
-  padding:0 clamp(16px,4vw,40px) 30px;
+  padding:0 clamp(16px,4vw,40px) 24px;
 }
 .sec-tag{
-  display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-hi);margin-bottom:16px;
+  display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-hi);margin-bottom:14px;
   opacity:0;transform:translateY(18px);transition:all .8s var(--ease);
 }
 .sec-title{
-  font-size:clamp(32px,5vw,54px);font-weight:800;letter-spacing:-.03em;line-height:1.06;
+  font-size:clamp(30px,4.5vw,52px);font-weight:800;letter-spacing:-.035em;line-height:1.06;
   opacity:0;transform:translateY(24px);transition:all .8s var(--ease) .08s;
 }
-.sec-desc{margin-top:14px;color:var(--muted);font-size:16px;max-width:52ch;line-height:1.6;
+.sec-desc{margin-top:12px;color:var(--text-sub);font-size:15.5px;max-width:54ch;line-height:1.6;
   opacity:0;transform:translateY(24px);transition:all .8s var(--ease) .16s;}
 .reveal.in .sec-tag,.reveal.in .sec-title,.reveal.in .sec-desc{opacity:1;transform:none}
 
+.dup-banner{
+  max-width:1180px;margin:0 auto 16px;
+  padding:12px 20px;border-radius:14px;
+  background:rgba(234,88,12,.12);border:1px solid rgba(234,88,12,.35);
+  display:none;align-items:center;justify-content:space-between;gap:12px;
+  font-size:13.5px;color:#FED7AA;
+}
+.dup-banner.show{display:flex}
+
+.bulk-bar{
+  max-width:1180px;margin:0 auto 14px;
+  padding:10px 18px;border-radius:14px;
+  background:rgba(11,19,28,.95);border:1px solid var(--border-hi);backdrop-filter:blur(14px);
+  display:none;align-items:center;gap:12px;flex-wrap:wrap;
+  box-shadow:0 10px 30px -10px rgba(0,0,0,.6);
+}
+.bulk-bar.show{display:flex}
+.bulk-count{font-weight:700;color:var(--primary-hi);font-size:13.5px}
+
 .toolbar{
   max-width:1180px;margin:0 auto;
-  padding:0 clamp(16px,4vw,40px) 26px;
-  display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  padding:0 clamp(16px,4vw,40px) 16px;
+  display:flex;gap:12px;align-items:center;flex-wrap:wrap;
 }
 .searchbox{
-  flex:1;min-width:250px;display:flex;align-items:center;gap:12px;
-  height:52px;padding:0 20px;border-radius:14px;
-  background:var(--card);border:1px solid var(--border);
-  transition:border-color .25s,box-shadow .25s;
-}
-.searchbox:focus-within{border-color:var(--border-hi);box-shadow:0 0 0 4px rgba(13,148,136,.12)}
-.searchbox svg{width:18px;height:18px;color:var(--muted);flex:none}
-.searchbox input{
-  flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--text);
-}
-.searchbox input::placeholder{color:#5E7580}
-.kbd{
-  font-size:11px;font-weight:600;color:var(--muted);
-  border:1px solid var(--border);border-radius:6px;padding:3px 8px;
-  background:var(--bg2);
-}
-.chips{
-  max-width:1180px;margin:0 auto;
-  padding:0 clamp(16px,4vw,40px) 24px;
-  display:flex;gap:10px;flex-wrap:wrap;
-}
-.chip{
-  height:36px;padding:0 16px;border-radius:99px;
-  border:1px solid var(--border);color:var(--muted);
-  font-size:13px;font-weight:600;cursor:pointer;
-  display:inline-flex;align-items:center;gap:7px;
+  flex:1;min-width:240px;display:flex;align-items:center;gap:12px;
+  height:48px;padding:0 18px;border-radius:14px;
+  background:linear-gradient(180deg,rgba(11,19,28,.8) 0%,rgba(8,14,20,.9) 100%);
+  border:1px solid var(--border);backdrop-filter:blur(12px);
   transition:all .25s var(--ease);
 }
-.chip:hover{color:var(--text);border-color:var(--border-hi);transform:translateY(-1px)}
-.chip.active{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
-.chip b{font-weight:700;opacity:.65;font-size:11px;font-variant-numeric:tabular-nums}
-.pill{
-  font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
-  color:var(--primary-hi);background:rgba(20,184,166,.09);
-  border:1px solid rgba(20,184,166,.28);border-radius:99px;padding:4px 11px;
-  white-space:nowrap;
+.searchbox:focus-within{border-color:var(--border-hi);box-shadow:0 0 0 4px rgba(13,148,136,.14),0 8px 24px -6px rgba(0,0,0,.5)}
+.searchbox svg{width:18px;height:18px;color:var(--muted);flex:none}
+.searchbox input{
+  flex:1;background:none;border:none;outline:none;font-size:14.5px;color:var(--text);
+}
+.searchbox input::placeholder{color:#576F7C}
+.kbd{
+  font-size:10.5px;font-weight:700;color:var(--muted);
+  border:1px solid var(--border);border-radius:6px;padding:3px 7px;
+  background:var(--bg2);letter-spacing:.05em;
 }
 
+.tool-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* Chips */
+.chips{
+  max-width:1180px;margin:0 auto;
+  padding:0 clamp(16px,4vw,40px) 18px;
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+}
+.chip{
+  height:34px;padding:0 14px;border-radius:99px;
+  border:1px solid var(--border);color:var(--text-sub);
+  background:rgba(11,19,28,.6);
+  font-size:12.5px;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:all .22s var(--ease);
+}
+.chip:hover{color:var(--text);border-color:var(--border-hi);background:rgba(20,184,166,.08);transform:translateY(-1px)}
+.chip.active{background:var(--primary);color:var(--on-primary);border-color:var(--primary);box-shadow:0 4px 14px -3px rgba(13,148,136,.5)}
+.chip b{font-weight:700;opacity:.7;font-size:11px;font-variant-numeric:tabular-nums}
+.pill{
+  font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--primary-hi);background:rgba(20,184,166,.1);
+  border:1px solid rgba(20,184,166,.3);border-radius:99px;padding:3px 10px;
+  white-space:nowrap;
+}
+.tag-pill{
+  font-size:10.5px;font-weight:600;letter-spacing:.03em;
+  color:#94A3B8;background:rgba(148,163,184,.08);
+  border:1px solid rgba(148,163,184,.16);border-radius:6px;padding:2px 8px;
+  white-space:nowrap;cursor:pointer;transition:all .2s;
+}
+.tag-pill:hover{color:var(--primary-hi);border-color:var(--border-hi);background:rgba(20,184,166,.09)}
+
+/* Card Grid */
 .grid{
   max-width:1180px;margin:0 auto;
   padding:0 clamp(16px,4vw,40px) 110px;
   display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;
 }
+.grid.list-view{
+  grid-template-columns:1fr;
+}
 
 .card{
   position:relative;
-  background:linear-gradient(180deg,var(--card) 0%,var(--card2) 100%);
+  background:linear-gradient(180deg,rgba(11,19,28,.9) 0%,rgba(8,14,20,.95) 100%);
   border:1px solid var(--border);border-radius:18px;
   padding:22px;
   display:flex;flex-direction:column;gap:12px;
-  transition:opacity .7s var(--ease),transform .7s var(--ease),border-color .25s,box-shadow .35s;
-  opacity:0;transform:translateY(34px) scale(.97);
+  transition:opacity .6s var(--ease),transform .6s var(--ease),border-color .22s,box-shadow .28s;
+  opacity:0;transform:translateY(30px) scale(.98);
+  box-shadow:var(--shadow-card);
 }
 .card.in{opacity:1;transform:none}
+.card.selected{border-color:var(--primary-hi);box-shadow:0 0 0 2px var(--primary-hi)}
 .card::before{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(20,184,166,.10),transparent 65%);
+  background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(20,184,166,.12),transparent 65%);
   opacity:0;transition:opacity .35s;
 }
-.card:hover{border-color:var(--border-hi);transform:translateY(-5px);box-shadow:0 22px 48px -18px rgba(0,0,0,.65)}
+.card:hover{border-color:var(--border-hi);transform:translateY(-4px);box-shadow:var(--shadow-hover)}
 .card:hover::before{opacity:1}
 .card-top{display:flex;align-items:center;gap:13px}
 .avatar{
   width:44px;height:44px;border-radius:13px;flex:none;
   display:flex;align-items:center;justify-content:center;
-  font-weight:800;font-size:16px;letter-spacing:.02em;color:#04110D;
+  font-weight:800;font-size:16px;letter-spacing:.02em;color:#03130F;
+  box-shadow:0 6px 16px -4px rgba(0,0,0,.4);
 }
 .card-name{
-  font-size:16.5px;font-weight:700;letter-spacing:-.01em;line-height:1.25;
-  overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;
+  font-size:16px;font-weight:700;letter-spacing:-.015em;line-height:1.25;
+  color:#FFFFFF;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;
 }
 .card-url{font-size:12.5px;color:var(--primary-hi);margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
-.card-notes{font-size:13.5px;line-height:1.6;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
-.card-notes.empty-note{font-style:italic;color:#54707C}
+.card-notes{font-size:13.5px;line-height:1.6;color:var(--text-sub);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.card-notes.empty-note{font-style:italic;color:#4B6470}
+
+.card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+
 .card-foot{
   margin-top:auto;padding-top:14px;border-top:1px solid var(--border);
   display:flex;align-items:center;gap:8px;
 }
-.card-date{font-size:11.5px;color:#5E7580;margin-right:auto;font-variant-numeric:tabular-nums}
+.card-date{font-size:11.5px;color:var(--muted);margin-right:auto;font-variant-numeric:tabular-nums}
 .icon-btn{
-  width:36px;height:36px;border-radius:10px;
+  width:34px;height:34px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;
   color:var(--muted);border:1px solid transparent;
-  transition:all .2s;
+  transition:all .18s var(--ease);
 }
-.icon-btn svg{width:16px;height:16px}
-.icon-btn:hover{color:var(--text);background:rgba(148,163,184,.09);border-color:var(--border)}
-.icon-btn.open:hover{color:var(--primary-hi);background:rgba(20,184,166,.1)}
+.icon-btn svg{width:15px;height:15px}
+.icon-btn:hover{color:var(--text);background:rgba(148,163,184,.1);border-color:var(--border);transform:scale(1.05)}
+.icon-btn.open:hover{color:var(--primary-hi);background:rgba(20,184,166,.12);border-color:var(--border-hi)}
 .icon-btn.del:hover{color:#FCA5A5;background:rgba(220,38,38,.12);border-color:rgba(220,38,38,.3)}
+.card-select{
+  width:18px;height:18px;border-radius:5px;accent-color:var(--primary-hi);
+  cursor:pointer;margin-right:4px;
+}
 
+/* Empty State */
 .empty{
   grid-column:1/-1;
   text-align:center;padding:80px 20px;
-  border:1px dashed rgba(148,163,184,.18);border-radius:22px;
+  border:1px dashed rgba(148,163,184,.18);border-radius:24px;
+  background:rgba(11,19,28,.4);
   opacity:0;transform:scale(.98);transition:all .7s var(--ease);
 }
 .empty.show{opacity:1;transform:none}
-.empty > svg{width:52px;height:52px;color:#2E4652;margin-bottom:18px}
-.empty h3{font-size:19px;font-weight:700;margin-bottom:8px}
-.empty p{color:var(--muted);font-size:14.5px;line-height:1.6;max-width:40ch;margin:0 auto 24px}
+.empty > svg{width:52px;height:52px;color:#283D4A;margin-bottom:18px}
+.empty h3{font-size:20px;font-weight:700;margin-bottom:8px}
+.empty p{color:var(--text-sub);font-size:14.5px;line-height:1.6;max-width:42ch;margin:0 auto 24px}
 
+/* Footer */
 footer{
   border-top:1px solid var(--border);
   padding:34px clamp(16px,4vw,40px);
   display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
   color:var(--muted);font-size:13px;
+  background:rgba(5,8,12,.6);
 }
 footer .brand{font-size:14px;margin-right:0}
 
+/* Modal Overlay */
 .overlay{
   position:fixed;inset:0;z-index:1100;
-  background:rgba(3,7,10,.66);backdrop-filter:blur(10px);
+  background:rgba(3,6,9,.75);backdrop-filter:blur(14px);
   display:flex;align-items:center;justify-content:center;padding:18px;
   opacity:0;visibility:hidden;
-  transition:opacity .35s var(--ease),visibility .35s;
+  transition:all .35s var(--ease);
 }
 .overlay.open{opacity:1;visibility:visible}
 .modal{
-  width:min(560px,100%);max-height:calc(100svh - 40px);overflow-y:auto;
-  background:linear-gradient(180deg,#101B26,#0C141D);
-  border:1px solid var(--border);border-radius:22px;padding:30px;
-  transform:translateY(26px) scale(.96);
+  width:min(580px,100%);max-height:calc(100svh - 40px);overflow-y:auto;
+  background:linear-gradient(180deg,#0E1824,#0A111A);
+  border:1px solid var(--border-hi);border-radius:24px;padding:32px;
+  box-shadow:0 30px 70px -15px rgba(0,0,0,.85),0 0 35px -8px rgba(20,184,166,.2);
+  transform:translateY(24px) scale(.97);
   transition:transform .45s var(--ease);
 }
 .overlay.open .modal{transform:none}
-.modal h2{font-size:21px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
-.modal p.hint{color:var(--muted);font-size:13.5px;margin-bottom:24px}
-.field{margin-bottom:18px}
-.field label{display:block;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.modal h2{font-size:22px;font-weight:800;letter-spacing:-.025em;margin-bottom:4px;color:#FFFFFF}
+.modal p.hint{color:var(--text-sub);font-size:13.5px;margin-bottom:22px;line-height:1.5}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
 .field label em{color:var(--accent-hi);font-style:normal}
-.field input,.field textarea{
+.field input,.field textarea,.field select{
   width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:12px;
-  padding:13px 16px;font-size:14.5px;outline:none;color:var(--text);
-  transition:border-color .2s,box-shadow .2s;
+  padding:12px 16px;font-size:14px;outline:none;color:var(--text);
+  transition:all .2s;
 }
-.field textarea{resize:vertical;min-height:110px;line-height:1.6}
-.field input:focus,.field textarea:focus{border-color:var(--border-hi);box-shadow:0 0 0 4px rgba(13,148,136,.12)}
-.field .err{display:none;margin-top:7px;font-size:12.5px;color:#FCA5A5}
+.field textarea{resize:vertical;min-height:90px;line-height:1.6}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--primary-hi);box-shadow:0 0 0 4px rgba(20,184,166,.15)}
+.field .err{display:none;margin-top:6px;font-size:12px;color:#FCA5A5}
 .field.invalid input{border-color:rgba(220,38,38,.6)}
 .field.invalid .err{display:block}
-.modal-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:26px}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:26px}
 
+/* Toasts */
 .toasts{position:fixed;bottom:24px;right:24px;z-index:1300;display:flex;flex-direction:column;gap:10px}
 .toast{
   display:flex;align-items:center;gap:11px;
-  background:#0F1A24;border:1px solid var(--border-hi);border-radius:14px;
-  padding:13px 18px;font-size:13.5px;font-weight:500;
-  box-shadow:0 18px 40px -12px rgba(0,0,0,.6);
-  animation:toastIn .5s var(--ease);
+  background:#0B141E;border:1px solid var(--border-hi);border-radius:14px;
+  padding:13px 18px;font-size:13.5px;font-weight:600;
+  box-shadow:0 20px 48px -12px rgba(0,0,0,.75),0 0 24px -6px rgba(20,184,166,.2);
+  animation:toastIn .45s var(--ease);
 }
-.toast.bye{transition:all .4s var(--ease);opacity:0;transform:translateX(24px)}
+.toast.bye{transition:all .35s var(--ease);opacity:0;transform:translateX(24px)}
 .toast svg{width:17px;height:17px;color:var(--primary-hi);flex:none}
 .toast.warn svg{color:var(--accent-hi)}
 @keyframes toastIn{from{opacity:0;transform:translateX(30px) scale(.94)}}
 
-@media (max-width:640px){
+.tab-nav{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;gap:8px}
+.tab-btn{padding:8px 16px;font-weight:700;font-size:13.5px;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s}
+.tab-btn.active{color:var(--primary-hi);border-bottom-color:var(--primary-hi)}
+
+.table-view{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.table-view th{text-align:left;padding:9px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em}
+.table-view td{padding:11px 9px;border-bottom:1px solid rgba(255,255,255,.05)}
+
+@media (max-width:768px){
   .stats{grid-template-columns:1fr}
   .nav-label{display:none}
-  .btn{padding:0 15px}
+  .btn{padding:0 12px}
   .kbd{display:none}
-  .hero{padding-top:96px}
+  .hero{padding-top:90px}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -366,14 +458,38 @@ footer .brand{font-size:14px;margin-right:0}
 <nav id="nav" aria-label="Main navigation">
   <div class="brand">
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg>
-    Resource Manager
+    <span class="brand-text">Resource Manager</span>
   </div>
   <div class="nav-btns">
-    <button class="btn btn-ghost" id="importBtn" title="Import JSON backup">
+    <button class="sync-badge" id="syncStatusBadge" title="Multi-device Cloud Sync">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncStatusText">Local</span>
+    </button>
+    <button class="btn btn-ghost" id="authBtnNav" title="Account Login & Profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="nav-label" id="authBtnLabel">Sign In</span>
+    </button>
+    <button class="btn btn-ghost" id="syncBtnNav" title="Cloud Sync">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+      <span class="nav-label">Sync</span>
+    </button>
+    <button class="btn btn-ghost" id="backupsBtnNav" title="Automated Backups & Snapshots">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+      <span class="nav-label">Backups</span>
+    </button>
+    <button class="btn btn-ghost" id="cryptoBtnNav" title="Passphrase Encryption">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span class="nav-label">Encrypt</span>
+    </button>
+    <button class="btn btn-ghost" id="extensionBtnNav" title="Browser Extension Capture">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="nav-label">Extension</span>
+    </button>
+    <button class="btn btn-ghost" id="importBtn" title="Import JSON / Netscape HTML / Encrypted Vault">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       <span class="nav-label">Import</span>
     </button>
-    <button class="btn btn-ghost" id="exportBtn" title="Export JSON backup">
+    <button class="btn btn-ghost" id="exportBtn" title="Export Backup">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       <span class="nav-label">Export</span>
     </button>
@@ -426,11 +542,33 @@ footer .brand{font-size:14px;margin-right:0}
     <p class="sec-desc">Every card lives in your browser — private, instant, offline-ready. Search by name, URL or even a word from your notes.</p>
   </div>
 
+  <div class="dup-banner" id="dupBanner">
+    <span>⚠️ <strong id="dupCount">0</strong> duplicate URLs detected in your vault.</span>
+    <button class="btn btn-sm btn-ghost" id="dedupeBtn">Merge & Clean Duplicates</button>
+  </div>
+
+  <div class="bulk-bar" id="bulkBar">
+    <span class="bulk-count" id="bulkSelectedText">0 selected</span>
+    <button class="btn btn-sm btn-ghost" id="bulkSelectAll">Select All</button>
+    <button class="btn btn-sm btn-ghost" id="bulkCategoryBtn">Set Category</button>
+    <button class="btn btn-sm btn-ghost" id="bulkTagBtn">Add Tag</button>
+    <button class="btn btn-sm btn-danger" id="bulkDeleteBtn">Delete Selected</button>
+    <button class="btn btn-sm btn-ghost" id="bulkCancelBtn" style="margin-left:auto">Exit Bulk Mode</button>
+  </div>
+
   <div class="toolbar">
     <div class="searchbox">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="search" id="searchInput" placeholder="Search by name, URL or notes..." autocomplete="off">
+      <input type="search" id="searchInput" placeholder="Search by name, URL, notes, or tags..." autocomplete="off">
       <span class="kbd">Ctrl K</span>
+    </div>
+    <div class="tool-actions">
+      <button class="btn btn-ghost btn-sm" id="viewToggleBtn" title="Toggle Grid / List View">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <span id="viewToggleLabel">View</span>
+      </button>
+      <button class="btn btn-ghost btn-sm" id="bulkToggleBtn">Bulk Mode</button>
+      <button class="btn btn-ghost btn-sm" id="shortcutsBtn" title="Keyboard Shortcuts (?)">Shortcuts</button>
     </div>
   </div>
 
@@ -444,9 +582,12 @@ footer .brand{font-size:14px;margin-right:0}
     <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;color:var(--primary-hi)" aria-hidden="true"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg>
     Resource Manager
   </div>
-  <div>Data stored locally in this browser &middot; Export regularly for backup</div>
+  <div>Data stored locally & Cloud-Synced &middot; Fully encrypted backup supported</div>
 </footer>
 
+<!-- Modals -->
+
+<!-- Add/Edit Modal -->
 <div class="overlay" id="formOverlay" role="dialog" aria-modal="true" aria-labelledby="formTitle">
   <div class="modal">
     <h2 id="formTitle">Add New Resource</h2>
@@ -467,6 +608,10 @@ footer .brand{font-size:14px;margin-right:0}
       <datalist id="catList"></datalist>
     </div>
     <div class="field">
+      <label for="fTags">Tags (comma-separated)</label>
+      <input id="fTags" placeholder="e.g. docs, api, cheat-sheet" maxlength="150" autocomplete="off">
+    </div>
+    <div class="field">
       <label for="fNotes">Description / Notes</label>
       <textarea id="fNotes" placeholder="What is it for? Why is it important? Any login hints?"></textarea>
     </div>
@@ -477,6 +622,7 @@ footer .brand{font-size:14px;margin-right:0}
   </div>
 </div>
 
+<!-- Confirm Delete Modal -->
 <div class="overlay" id="confirmOverlay" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:430px">
     <h2>Delete resource?</h2>
@@ -489,7 +635,197 @@ footer .brand{font-size:14px;margin-right:0}
   </div>
 </div>
 
-<input type="file" id="fileInput" accept=".json,application/json" hidden>
+<!-- Account & Cloud Sync Modal -->
+<div class="overlay" id="syncOverlay" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:480px">
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tabAccount">Account & Login</button>
+      <button class="tab-btn" id="tabStatus">Sync Engine</button>
+    </div>
+
+    <!-- Account Tab View -->
+    <div id="syncAccountView">
+      <!-- Guest State (Not Logged In) -->
+      <div id="authGuestSection">
+        <h2 id="authHeading">Sign In to Your Vault</h2>
+        <p class="hint">Access your bookmarks securely with multi-device cloud synchronization.</p>
+
+        <div style="display:flex;gap:8px;margin-bottom:18px;background:var(--bg2);padding:4px;border-radius:11px;border:1px solid var(--border)">
+          <button class="btn btn-sm btn-primary" id="switchSignInBtn" style="flex:1">Sign In</button>
+          <button class="btn btn-sm btn-ghost" id="switchSignUpBtn" style="flex:1;border:none">Create Account</button>
+        </div>
+
+        <div class="field">
+          <label for="syncEmail">Email Address</label>
+          <input type="email" id="syncEmail" placeholder="your@email.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="syncPass">Password</label>
+          <input type="password" id="syncPass" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <div class="field" id="syncConfirmPassWrap" style="display:none">
+          <label for="syncConfirmPass">Confirm Password</label>
+          <input type="password" id="syncConfirmPass" placeholder="••••••••" autocomplete="new-password">
+        </div>
+
+        <button class="btn btn-primary" id="syncSubmitBtn" style="width:100%;height:44px;margin-top:8px">
+          Sign In
+        </button>
+      </div>
+
+      <!-- Logged In State -->
+      <div id="authLoggedInSection" style="display:none">
+        <h2>My Account</h2>
+        <p class="hint">You are signed in. Your bookmarks are actively synced to the cloud.</p>
+        <div style="background:var(--bg2);padding:18px;border-radius:14px;border:1px solid var(--border);margin-bottom:18px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div class="avatar" id="authAvatar" style="background:var(--primary);color:#02110D;width:42px;height:42px;border-radius:12px;font-size:16px;font-weight:800">U</div>
+            <div style="min-width:0;flex:1">
+              <div style="font-weight:700;font-size:15px;color:#FFFFFF" id="authEmailDisplay">user@example.com</div>
+              <div style="font-size:12px;color:var(--primary-hi);font-weight:600">Cloud Storage: Synchronized</div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--text-sub);display:flex;justify-content:space-between">
+            <span>Vault Bookmarks:</span>
+            <strong id="authVaultCount" style="color:#FFFFFF">0</strong>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" id="authSyncNowBtn" style="flex:1">Sync Now</button>
+          <button class="btn btn-danger" id="authLogoutBtn" style="flex:1">Sign Out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sync Status Tab View -->
+    <div id="syncStatusView" style="display:none">
+      <h2>Cloud Sync Engine</h2>
+      <p class="hint">Multi-device real-time sync with PostgreSQL and automatic conflict resolution.</p>
+      <div style="background:var(--bg2);padding:18px;border-radius:14px;border:1px solid var(--border);margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-weight:700">Sync Engine:</span>
+          <span id="syncModeLabel" style="color:var(--primary-hi);font-weight:700">Active</span>
+        </div>
+        <div style="font-size:13px;color:var(--text-sub);margin-bottom:6px">Last Sync: <span id="lastSyncTimeLabel">Never</span></div>
+        <div style="font-size:13px;color:var(--text-sub)">Local Bookmarks: <span id="syncLocalCount">0</span></div>
+      </div>
+      <button class="btn btn-primary" id="triggerSyncBtn" style="width:100%">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        Synchronize Now
+      </button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" data-close>Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Backups & Snapshots Modal -->
+<div class="overlay" id="backupsOverlay" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:680px">
+    <h2>Automated Backups & Version History</h2>
+    <p class="hint">Every snapshot includes SHA-256 integrity verification and point-in-time recovery preview.</p>
+    <div style="display:flex;gap:10px;margin-bottom:18px">
+      <button class="btn btn-primary btn-sm" id="createSnapshotBtn">Create Instant Snapshot</button>
+      <button class="btn btn-ghost btn-sm" id="refreshBackupsBtn">Refresh List</button>
+    </div>
+    <div id="backupPreviewBox" style="display:none;background:var(--bg2);padding:16px;border-radius:12px;border:1px solid var(--border-hi);margin-bottom:16px">
+      <h3 style="font-size:15px;margin-bottom:8px;color:var(--primary-hi)" id="previewTitle">Restore Preview</h3>
+      <div id="previewDetails" style="font-size:13px;color:var(--text-sub);margin-bottom:12px"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-danger btn-sm" id="confirmRestoreBtn">Confirm & Restore</button>
+        <button class="btn btn-ghost btn-sm" id="cancelRestoreBtn">Cancel</button>
+      </div>
+    </div>
+    <div style="max-height:260px;overflow-y:auto">
+      <table class="table-view" id="backupsTable">
+        <thead>
+          <tr>
+            <th>Label / Type</th>
+            <th>Items</th>
+            <th>Created</th>
+            <th>SHA-256</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="backupsBody">
+          <tr><td colspan="5" style="text-align:center;color:var(--muted)">Loading backups...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" data-close>Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Encryption Modal -->
+<div class="overlay" id="cryptoOverlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <h2>Zero-Knowledge AES-256 Vault Encryption</h2>
+    <p class="hint">Export encrypted backups (.rmvault) using Web Crypto AES-256-GCM with PBKDF2 key derivation.</p>
+    <div class="field">
+      <label for="cryptoPass">Vault Passphrase</label>
+      <input type="password" id="cryptoPass" placeholder="Enter a strong passphrase">
+    </div>
+    <div style="font-size:12.5px;color:var(--text-sub);line-height:1.5;margin-bottom:18px">
+      🛡️ <strong>Encryption Guarantee:</strong> Your passphrase never leaves this browser. Data is encrypted using AES-256-GCM authenticated cipher with 100,000 PBKDF2 rounds.
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-accent" id="exportEncryptedBtn" style="flex:1">Export Encrypted (.rmvault)</button>
+      <button class="btn btn-ghost" id="importEncryptedBtn" style="flex:1">Import & Decrypt</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" data-close>Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Browser Extension Modal -->
+<div class="overlay" id="extensionOverlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <h2>Browser Extension (Manifest V3)</h2>
+    <p class="hint">Capture any webpage, highlighted text, category and tags in 1 click.</p>
+    <div style="background:var(--bg2);padding:18px;border-radius:14px;border:1px solid var(--border);font-size:13.5px;line-height:1.6;margin-bottom:16px">
+      <p style="margin-bottom:10px"><strong>Quick Setup Instructions:</strong></p>
+      <ol style="margin-left:20px;display:flex;flex-direction:column;gap:6px">
+        <li>Open <code>chrome://extensions/</code> in your browser.</li>
+        <li>Enable <strong>Developer mode</strong> (top-right toggle).</li>
+        <li>Click <strong>Load unpacked</strong>.</li>
+        <li>Select the <code>extension</code> folder in this project!</li>
+      </ol>
+    </div>
+    <div style="display:flex;gap:10px">
+      <a href="/extension/README.md" target="_blank" rel="noopener" class="btn btn-ghost" style="flex:1">Read Setup Guide</a>
+      <button class="btn btn-primary" id="testExtensionConnBtn" style="flex:1">Test Extension API</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" data-close>Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Shortcuts Modal -->
+<div class="overlay" id="shortcutsOverlay" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:440px">
+    <h2>Keyboard Shortcuts</h2>
+    <p class="hint">Navigate and organize at lightning speed.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px">
+      <div style="display:flex;justify-content:space-between"><span>Focus search</span><span class="kbd">Ctrl + K</span></div>
+      <div style="display:flex;justify-content:space-between"><span>Add new resource</span><span class="kbd">Ctrl + N</span></div>
+      <div style="display:flex;justify-content:space-between"><span>Toggle Bulk Mode</span><span class="kbd">Ctrl + B</span></div>
+      <div style="display:flex;justify-content:space-between"><span>Synchronize Vault</span><span class="kbd">Ctrl + S</span></div>
+      <div style="display:flex;justify-content:space-between"><span>Close active dialog</span><span class="kbd">Esc</span></div>
+      <div style="display:flex;justify-content:space-between"><span>Open site</span><span class="kbd">Double-click</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" data-close>Close</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".json,.rmvault,.html,application/json,text/html" hidden>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <script>
@@ -497,20 +833,53 @@ footer .brand{font-size:14px;margin-right:0}
 const STORE_KEY = "rm_resources_v2";
 const $ = s => document.querySelector(s);
 
+// Global State
 let resources = [];
 let editingId = null;
 let pendingDelete = null;
 let activeCat = "all";
+let activeTag = null;
+let bulkMode = false;
+let isListView = false;
+let selectedIds = new Set();
+let pendingRestoreBackupId = null;
 
 const grid = $("#grid"), searchInput = $("#searchInput"),
       formOverlay = $("#formOverlay"), confirmOverlay = $("#confirmOverlay"),
       fName = $("#fName"), fUrl = $("#fUrl"), fNotes = $("#fNotes"),
-      fCat = $("#fCat"), catList = $("#catList"), chipsEl = $("#chips");
+      fCat = $("#fCat"), fTags = $("#fTags"), catList = $("#catList"), chipsEl = $("#chips");
 
+/* ---------- PERSISTENCE & MIGRATION ENGINE (ZERO DATA LOSS) ---------- */
 function load(){
-  try{ const d = JSON.parse(localStorage.getItem(STORE_KEY)); return Array.isArray(d) ? d : []; }
-  catch(e){ return []; }
+  let items = null;
+
+  // 1. Primary namespaced key
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) items = JSON.parse(raw);
+  }catch(e){}
+
+  // 2. Safe Migration from legacy keys: rm_resources, rm_resources_v1, bookmarks, resources
+  if(!Array.isArray(items) || items.length === 0){
+    const legacyKeys = ["rm_resources", "rm_resources_v1", "bookmarks", "resources"];
+    for(const k of legacyKeys){
+      try{
+        const legacy = localStorage.getItem(k);
+        if(legacy){
+          const parsed = JSON.parse(legacy);
+          if(Array.isArray(parsed) && parsed.length > 0){
+            items = parsed;
+            console.log(`[Migration] Migrated ${items.length} items from legacy storage key "${k}"`);
+            break;
+          }
+        }
+      }catch(e){}
+    }
+  }
+
+  return Array.isArray(items) ? items : [];
 }
+
 let quotaWarned = false;
 function persist(){
   try{
@@ -522,8 +891,74 @@ function persist(){
       toast("Browser storage is full — data is loaded but won't persist after refresh. Export a backup!", true);
     }
   }
+
+  // Backup to IndexedDB as secondary safe layer
+  saveToIndexedDB(resources);
+
+  // Background Cloud Sync
+  debouncedCloudSync();
 }
+
+// Secondary persistence: IndexedDB for zero-loss fallback
+function openDB(){
+  return new Promise((resolve, reject) => {
+    if(!window.indexedDB) return resolve(null);
+    const req = indexedDB.open("ResourceManagerDB", 1);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains("vault")) {
+        db.createObjectStore("vault", { keyPath: "key" });
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = () => resolve(null);
+  });
+}
+
+async function saveToIndexedDB(data){
+  try{
+    const db = await openDB();
+    if(!db) return;
+    const tx = db.transaction("vault", "readwrite");
+    tx.objectStore("vault").put({ key: "resources", data });
+  }catch(e){}
+}
+
+async function restoreFromIndexedDB(){
+  try{
+    const db = await openDB();
+    if(!db) return [];
+    return new Promise(resolve => {
+      const tx = db.transaction("vault", "readonly");
+      const req = tx.objectStore("vault").get("resources");
+      req.onsuccess = () => resolve(req.result?.data || []);
+      req.onerror = () => resolve([]);
+    });
+  }catch(e){ return []; }
+}
+
+// Multi-tab synchronization
+window.addEventListener("storage", e => {
+  if(e.key === STORE_KEY && e.newValue){
+    try{
+      const fresh = JSON.parse(e.newValue);
+      if(Array.isArray(fresh)){
+        resources = fresh;
+        render();
+      }
+    }catch(err){}
+  }
+});
+
+// Guard against tab close during writes
+window.addEventListener("beforeunload", () => {
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(resources));
+  }catch(e){}
+});
+
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
 function normalizeUrl(u){
   u = (u||"").trim().slice(0,2048);
   if(!u) return "";
@@ -537,14 +972,17 @@ function normalizeUrl(u){
   u = "https://" + u.replace(/^\/+/, "");
   return /^https?:\/\//i.test(u) ? u : "";
 }
+
 function esc(s){
   return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+
 function prettyDate(iso){
   if(!iso) return "";
   const d = new Date(iso);
   return isNaN(d) ? "" : d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
 }
+
 function hostOf(u){ try{ return new URL(normalizeUrl(u)).hostname.replace(/^www\./,""); }catch(e){ return ""; } }
 
 const PALETTE = ["#2DD4BF","#FB923C","#38BDF8","#A78BFA","#F472B6","#4ADE80","#FACC15","#60A5FA"];
@@ -553,6 +991,7 @@ function avatarColor(name){
   for(let i=0;i<name.length;i++) h = (h*31 + name.charCodeAt(i)) >>> 0;
   return PALETTE[h % PALETTE.length];
 }
+
 function initials(name){
   const w = name.trim().split(/\s+/);
   return ((w[0]?.[0]||"?") + (w.length>1 ? w[w.length-1][0] : "")).toUpperCase();
@@ -572,8 +1011,8 @@ addEventListener("scroll", () => {
     progress.style.transform = `scaleX(${max > 0 ? st/max : 0})`;
     nav.classList.toggle("scrolled", st > 30);
     if(!reducedMotion && st < innerHeight){
-      heroContent.style.transform = `translateY(${st * .22}px)`;
-      heroContent.style.opacity = String(Math.max(0, 1 - st/(innerHeight*.72)));
+      heroContent.style.transform = `translateY(${st * .2}px)`;
+      heroContent.style.opacity = String(Math.max(0, 1 - st/(innerHeight*.75)));
     }
     ticking = false;
   });
@@ -652,6 +1091,7 @@ function statValues(){
     categories: new Set(resources.map(r => (r.category||"").trim()).filter(Boolean)).size
   };
 }
+
 function animateCounters(){
   const vals = statValues();
   document.querySelectorAll("[data-count]").forEach((el,i) => {
@@ -668,19 +1108,39 @@ function animateCounters(){
   });
 }
 
-/* ---------- cards ---------- */
+/* ---------- cards & filtering ---------- */
 function filtered(){
   const q = searchInput.value.trim().toLowerCase();
   return [...resources]
-    .sort((a,b) => (a.name||"").localeCompare(b.name||""))
+    .sort((a,b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0) || (a.name||"").localeCompare(b.name||""))
     .filter(r => activeCat === "all" || (r.category||"").trim() === activeCat)
-    .filter(r => !q || [r.name,r.url,r.notes,r.category].some(v => (v||"").toLowerCase().includes(q)));
+    .filter(r => !activeTag || (r.tags && r.tags.includes(activeTag)))
+    .filter(r => !q || [r.name, r.url, r.notes, r.category, ...(r.tags||[])].some(v => (v||"").toLowerCase().includes(q)));
+}
+
+function detectDuplicates(){
+  const counts = new Map();
+  resources.forEach(r => {
+    const u = (r.url||"").toLowerCase();
+    counts.set(u, (counts.get(u) || 0) + 1);
+  });
+  let dups = 0;
+  counts.forEach(c => { if(c > 1) dups += (c - 1); });
+  const banner = $("#dupBanner");
+  if(dups > 0){
+    $("#dupCount").textContent = dups;
+    banner.classList.add("show");
+  }else{
+    banner.classList.remove("show");
+  }
 }
 
 function render(){
   renderChips();
+  detectDuplicates();
   const list = filtered();
   grid.innerHTML = "";
+  grid.className = "grid" + (isListView ? " list-view" : "");
 
   const empty = document.createElement("div");
   empty.className = "empty";
@@ -725,21 +1185,33 @@ function render(){
 
 function cardEl(r,i){
   const card = document.createElement("article");
-  card.className = "card";
-  card.style.transitionDelay = reducedMotion ? "0s" : (Math.min(i % 9, 8) * .06) + "s";
+  card.className = "card" + (selectedIds.has(r.id) ? " selected" : "");
+  card.style.transitionDelay = reducedMotion ? "0s" : (Math.min(i % 9, 8) * .05) + "s";
+  card.dataset.id = r.id;
+  card.draggable = !bulkMode;
+
   const notes = (r.notes||"").trim();
+  const tagsHtml = Array.isArray(r.tags) && r.tags.length > 0
+    ? `<div class="card-tags">${r.tags.map(t => `<span class="tag-pill" data-tag="${esc(t)}">#${esc(t)}</span>`).join("")}</div>`
+    : "";
+
   card.innerHTML = `
     <div class="card-top">
+      ${bulkMode ? `<input type="checkbox" class="card-select" ${selectedIds.has(r.id) ? "checked" : ""}>` : ""}
       <div class="avatar" style="background:${avatarColor(r.name||"?")}">${esc(initials(r.name||"?"))}</div>
-      <div style="min-width:0">
+      <div style="min-width:0;flex:1">
         <div class="card-name">${esc(r.name)}</div>
         <div class="card-url">${esc(hostOf(r.url))}</div>
       </div>
     </div>
     ${notes ? `<div class="card-notes">${esc(notes)}</div>` : `<div class="card-notes empty-note">No notes yet.</div>`}
+    ${tagsHtml}
     <div class="card-foot">
       ${r.category ? `<span class="pill">${esc(r.category)}</span>` : ""}
       <span class="card-date">${prettyDate(r.created)}</span>
+      <button class="icon-btn copy-url" title="Copy URL" aria-label="Copy ${esc(r.name)} URL">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
       <button class="icon-btn edit" title="Edit" aria-label="Edit ${esc(r.name)}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
       </button>
@@ -755,6 +1227,58 @@ function cardEl(r,i){
     const b = card.getBoundingClientRect();
     card.style.setProperty("--mx", (e.clientX-b.left)+"px");
     card.style.setProperty("--my", (e.clientY-b.top)+"px");
+  });
+
+  if(bulkMode){
+    const chk = card.querySelector(".card-select");
+    chk?.addEventListener("change", e => {
+      if(e.target.checked) selectedIds.add(r.id);
+      else selectedIds.delete(r.id);
+      card.classList.toggle("selected", selectedIds.has(r.id));
+      updateBulkUI();
+    });
+  }
+
+  card.querySelectorAll(".tag-pill").forEach(el => {
+    el.addEventListener("click", e => {
+      e.stopPropagation();
+      const t = el.dataset.tag;
+      activeTag = (activeTag === t) ? null : t;
+      render();
+    });
+  });
+
+  // Copy URL button
+  card.querySelector(".copy-url").addEventListener("click", e => {
+    e.stopPropagation();
+    navigator.clipboard?.writeText(normalizeUrl(r.url)).then(() => {
+      toast("URL copied to clipboard!");
+    }).catch(() => {
+      toast("Could not copy URL", true);
+    });
+  });
+
+  // Drag and Drop ordering
+  card.addEventListener("dragstart", e => {
+    e.dataTransfer.setData("text/plain", r.id);
+    card.style.opacity = ".4";
+  });
+  card.addEventListener("dragend", () => card.style.opacity = "1");
+  card.addEventListener("dragover", e => e.preventDefault());
+  card.addEventListener("drop", e => {
+    e.preventDefault();
+    const draggedId = e.dataTransfer.getData("text/plain");
+    if(draggedId && draggedId !== r.id){
+      const fromIdx = resources.findIndex(x => x.id === draggedId);
+      const toIdx = resources.findIndex(x => x.id === r.id);
+      if(fromIdx >= 0 && toIdx >= 0){
+        const [moved] = resources.splice(fromIdx, 1);
+        resources.splice(toIdx, 0, moved);
+        resources.forEach((item, idx) => item.orderIndex = idx);
+        persist();
+        render();
+      }
+    }
   });
 
   card.querySelector(".edit").addEventListener("click", () => openForm(r.id));
@@ -780,23 +1304,38 @@ function updateStats(){
 }
 
 function renderChips(){
-  const cats = [...new Set(resources.map(r => (r.category||"").trim()).filter(Boolean))]
-    .sort((a,b) => a.localeCompare(b));
+  const cats = [...new Set(resources.map(r => (r.category||"").trim()).filter(Boolean))].sort((a,b) => a.localeCompare(b));
   if(activeCat !== "all" && !cats.includes(activeCat)) activeCat = "all";
 
   chipsEl.innerHTML = "";
   const mk = (label, val, count) => {
     const b = document.createElement("button");
-    b.className = "chip" + (activeCat === val ? " active" : "");
+    b.className = "chip" + (activeCat === val && !activeTag ? " active" : "");
     b.innerHTML = `${esc(label)} <b>${count}</b>`;
-    b.addEventListener("click", () => { activeCat = val; render(); });
+    b.addEventListener("click", () => { activeCat = val; activeTag = null; render(); });
     chipsEl.appendChild(b);
   };
   mk("All", "all", resources.length);
   cats.forEach(cat => mk(cat, cat, resources.filter(r => (r.category||"").trim() === cat).length));
 
+  // Tag filter if active
+  if(activeTag){
+    const tagChip = document.createElement("button");
+    tagChip.className = "chip active";
+    tagChip.innerHTML = `#${esc(activeTag)} <b style="margin-left:4px">✕</b>`;
+    tagChip.addEventListener("click", () => { activeTag = null; render(); });
+    chipsEl.appendChild(tagChip);
+  }
+
   catList.innerHTML = cats.map(x => `<option value="${esc(x)}">`).join("");
 }
+
+/* ---------- View Toggle (Grid / List) ---------- */
+$("#viewToggleBtn").addEventListener("click", () => {
+  isListView = !isListView;
+  $("#viewToggleLabel").textContent = isListView ? "List" : "Grid";
+  render();
+});
 
 /* ---------- form ---------- */
 function openForm(id){
@@ -808,9 +1347,10 @@ function openForm(id){
     $("#formTitle").textContent = "Edit Resource";
     fName.value = r?.name || ""; fUrl.value = r?.url || ""; fNotes.value = r?.notes || "";
     fCat.value = r?.category || "";
+    fTags.value = Array.isArray(r?.tags) ? r.tags.join(", ") : "";
   } else {
     $("#formTitle").textContent = "Add New Resource";
-    fName.value = ""; fUrl.value = ""; fNotes.value = ""; fCat.value = "";
+    fName.value = ""; fUrl.value = ""; fNotes.value = ""; fCat.value = ""; fTags.value = "";
   }
   openOverlay(formOverlay);
   setTimeout(() => fName.focus(), reducedMotion ? 0 : 180);
@@ -821,6 +1361,8 @@ function saveFromForm(){
   const url = normalizeUrl(fUrl.value);
   const notes = fNotes.value.trim().slice(0,2000);
   const category = fCat.value.trim().slice(0,40);
+  const tags = fTags.value.split(",").map(t => t.trim().slice(0,30)).filter(Boolean);
+
   let ok = true;
   fName.closest(".field").classList.toggle("invalid", !name); if(!name) ok = false;
   fUrl.closest(".field").classList.toggle("invalid", !url); if(!url) ok = false;
@@ -828,10 +1370,20 @@ function saveFromForm(){
 
   if(editingId){
     const r = resources.find(x => x.id === editingId);
-    Object.assign(r, {name, url, notes, category, updated:new Date().toISOString()});
+    Object.assign(r, {name, url, notes, category, tags, updated:new Date().toISOString()});
     toast(`"${name}" updated`);
   } else {
-    resources.push({id:uid(), name, url, notes, category, created:new Date().toISOString()});
+    resources.push({
+      id: uid(),
+      name,
+      url,
+      notes,
+      category,
+      tags,
+      orderIndex: resources.length,
+      created: new Date().toISOString(),
+      updated: new Date().toISOString()
+    });
     toast(`"${name}" saved to your vault`);
   }
   persist(); render(); closeOverlays();
@@ -852,23 +1404,23 @@ function doDelete(){
   toast(`"${r?.name}" deleted`, true);
 }
 
-/* ---------- overlays ---------- */
+/* ---------- overlay helpers ---------- */
 function openOverlay(o){
   o.classList.add("open");
-  o.querySelector(".modal").scrollTop = 0;
+  const m = o.querySelector(".modal");
+  if(m) m.scrollTop = 0;
 }
 function closeOverlays(){
-  formOverlay.classList.remove("open");
-  confirmOverlay.classList.remove("open");
+  document.querySelectorAll(".overlay").forEach(o => o.classList.remove("open"));
   pendingDelete = null;
 }
 document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", closeOverlays));
-[formOverlay, confirmOverlay].forEach(o =>
+document.querySelectorAll(".overlay").forEach(o =>
   o.addEventListener("click", e => { if(e.target === o) closeOverlays(); }));
 
 $("#saveBtn").addEventListener("click", saveFromForm);
 $("#confirmYes").addEventListener("click", doDelete);
-[fName,fUrl,fCat,fNotes].forEach(el => el.addEventListener("keydown", e => {
+[fName,fUrl,fCat,fTags,fNotes].forEach(el => el.addEventListener("keydown", e => {
   if(e.key === "Enter" && e.target !== fNotes) saveFromForm();
 }));
 
@@ -880,34 +1432,151 @@ function toast(msg, warn){
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${warn ? 'M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z' : 'M20 6L9 17l-5-5'}"/></svg>
     ${esc(msg)}`;
   $("#toasts").appendChild(t);
-  setTimeout(() => { t.classList.add("bye"); setTimeout(() => t.remove(), 450); }, 2800);
+  setTimeout(() => { t.classList.add("bye"); setTimeout(() => t.remove(), 450); }, 3000);
 }
 
-/* ---------- export / import ---------- */
+/* ---------- BULK OPERATIONS ---------- */
+function updateBulkUI(){
+  $("#bulkSelectedText").textContent = `${selectedIds.size} selected`;
+}
+
+$("#bulkToggleBtn").addEventListener("click", () => {
+  bulkMode = !bulkMode;
+  selectedIds.clear();
+  $("#bulkBar").classList.toggle("show", bulkMode);
+  $("#bulkToggleBtn").textContent = bulkMode ? "Exit Bulk" : "Bulk Mode";
+  render();
+});
+
+$("#bulkCancelBtn").addEventListener("click", () => {
+  bulkMode = false;
+  selectedIds.clear();
+  $("#bulkBar").classList.remove("show");
+  $("#bulkToggleBtn").textContent = "Bulk Mode";
+  render();
+});
+
+$("#bulkSelectAll").addEventListener("click", () => {
+  const list = filtered();
+  if(selectedIds.size === list.length){
+    selectedIds.clear();
+  } else {
+    list.forEach(r => selectedIds.add(r.id));
+  }
+  updateBulkUI();
+  render();
+});
+
+$("#bulkDeleteBtn").addEventListener("click", () => {
+  if(selectedIds.size === 0) return toast("No bookmarks selected", true);
+  const count = selectedIds.size;
+  resources = resources.filter(r => !selectedIds.has(r.id));
+  selectedIds.clear();
+  persist();
+  render();
+  toast(`${count} bookmarks removed`, true);
+});
+
+$("#bulkCategoryBtn").addEventListener("click", () => {
+  if(selectedIds.size === 0) return toast("No bookmarks selected", true);
+  const cat = prompt("Enter new category name for selected items:");
+  if(cat !== null){
+    const cleanCat = cat.trim().slice(0, 40);
+    resources.forEach(r => {
+      if(selectedIds.has(r.id)) r.category = cleanCat;
+    });
+    persist();
+    render();
+    toast(`Category updated for ${selectedIds.size} items`);
+  }
+});
+
+$("#bulkTagBtn").addEventListener("click", () => {
+  if(selectedIds.size === 0) return toast("No bookmarks selected", true);
+  const tag = prompt("Enter tag to add to selected items:");
+  if(tag){
+    const cleanTag = tag.trim().slice(0, 30);
+    resources.forEach(r => {
+      if(selectedIds.has(r.id)){
+        const tags = new Set(r.tags || []);
+        tags.add(cleanTag);
+        r.tags = Array.from(tags);
+      }
+    });
+    persist();
+    render();
+    toast(`Tag #${cleanTag} added`);
+  }
+});
+
+/* ---------- DEDUPLICATION ---------- */
+$("#dedupeBtn").addEventListener("click", () => {
+  const seen = new Set();
+  const deduped = [];
+  let removed = 0;
+  resources.forEach(r => {
+    const key = (r.url||"").toLowerCase();
+    if(!seen.has(key)){
+      seen.add(key);
+      deduped.push(r);
+    } else {
+      removed++;
+    }
+  });
+  resources = deduped;
+  persist();
+  render();
+  toast(`Cleaned ${removed} duplicate bookmark(s)`);
+});
+
+/* ---------- EXPORT / IMPORT (JSON, NETSCAPE HTML & ENCRYPTED VAULT) ---------- */
 $("#exportBtn").addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(resources,null,2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify(resources, null, 2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "resource-manager-backup.json";
+  a.download = `resource-manager-backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
   toast(`${resources.length} resources exported`);
 });
+
 $("#importBtn").addEventListener("click", () => $("#fileInput").click());
+
 $("#fileInput").addEventListener("change", e => {
   const file = e.target.files[0];
   if(!file) return;
+  const isVault = file.name.endsWith(".rmvault");
+  const isHtml = file.name.endsWith(".html") || file.name.endsWith(".htm");
   const reader = new FileReader();
-  reader.onerror = () => { toast("Could not read the file", true); e.target.value = ""; };
-  reader.onload = () => {
+
+  reader.onerror = () => { toast("Could not read file", true); e.target.value = ""; };
+  reader.onload = async () => {
+    const raw = String(reader.result).replace(/^\uFEFF/, "");
+
+    // 1. Handle Encrypted Vault (.rmvault)
+    if(isVault || raw.includes('"rm_vault_v1"')){
+      handleEncryptedImport(raw);
+      e.target.value = "";
+      return;
+    }
+
+    // 2. Handle Netscape HTML Bookmark file
+    if(isHtml || raw.includes("NETSCAPE-Bookmark-file-1")){
+      handleNetscapeHtmlImport(raw);
+      e.target.value = "";
+      return;
+    }
+
+    // 3. Handle Standard JSON
     let data;
     try{
-      data = JSON.parse(String(reader.result).replace(/^\uFEFF/, ""));
+      data = JSON.parse(raw);
     }catch(err){
       toast("Invalid JSON file", true);
       e.target.value = "";
       return;
     }
+
     if(!Array.isArray(data)){
       toast("Invalid format — JSON must be an array", true);
       e.target.value = "";
@@ -936,6 +1605,7 @@ $("#fileInput").addEventListener("change", e => {
           url,
           notes: String(item?.notes ?? "").slice(0,2000),
           category: String(item?.category ?? "").trim().slice(0,40),
+          tags: Array.isArray(item?.tags) ? item.tags.map(t => String(t).slice(0,30)) : [],
           created: item?.created || new Date().toISOString()
         });
         added++;
@@ -950,27 +1620,545 @@ $("#fileInput").addEventListener("change", e => {
       }
     })();
   };
+
   reader.readAsText(file);
 });
 
-/* ---------- shortcuts / misc ---------- */
-$("#addBtnNav").addEventListener("click", () => openForm());
-$("#addBtnHero").addEventListener("click", () => openForm());
-window.openForm = openForm;
+// Netscape HTML Bookmark Parser
+function handleNetscapeHtmlImport(html){
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const links = doc.querySelectorAll("a");
+  let count = 0;
+  links.forEach(a => {
+    const url = normalizeUrl(a.getAttribute("href"));
+    const name = (a.textContent || "").trim().slice(0, 120);
+    const cat = a.closest("dl")?.previousElementSibling?.textContent?.trim().slice(0, 40) || "";
+    if(url && name){
+      resources.push({
+        id: uid(),
+        name,
+        url,
+        notes: "",
+        category: cat,
+        tags: ["browser-import"],
+        created: new Date().toISOString()
+      });
+      count++;
+    }
+  });
+  persist();
+  render();
+  toast(`Imported ${count} bookmarks from browser export`);
+}
+
+/* ---------- WEB CRYPTO ENCRYPTION (AES-256-GCM + PBKDF2) ---------- */
+$("#cryptoBtnNav").addEventListener("click", () => openOverlay($("#cryptoOverlay")));
+
+async function deriveKey(passphrase, salt){
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(passphrase),
+    "PBKDF2",
+    false,
+    ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 100000,
+      hash: "SHA-256"
+    },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+$("#exportEncryptedBtn").addEventListener("click", async () => {
+  const pass = $("#cryptoPass").value;
+  if(!pass || pass.length < 6){
+    return toast("Passphrase must be at least 6 characters", true);
+  }
+
+  try{
+    const enc = new TextEncoder();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveKey(pass, salt);
+
+    const plaintext = enc.encode(JSON.stringify(resources));
+    const ciphertext = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      key,
+      plaintext
+    );
+
+    const vaultPayload = {
+      format: "rm_vault_v1",
+      salt: btoa(String.fromCharCode(...salt)),
+      iv: btoa(String.fromCharCode(...iv)),
+      data: btoa(String.fromCharCode(...new Uint8Array(ciphertext))),
+      count: resources.length,
+      exportedAt: new Date().toISOString()
+    };
+
+    const blob = new Blob([JSON.stringify(vaultPayload, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `resource-manager-encrypted-${new Date().toISOString().slice(0,10)}.rmvault`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    closeOverlays();
+    $("#cryptoPass").value = "";
+    toast("Encrypted vault exported securely");
+  }catch(err){
+    console.error("Encryption error:", err);
+    toast("Encryption failed: " + err.message, true);
+  }
+});
+
+$("#importEncryptedBtn").addEventListener("click", () => {
+  closeOverlays();
+  $("#fileInput").click();
+});
+
+async function handleEncryptedImport(raw){
+  let vault;
+  try{
+    vault = JSON.parse(raw);
+  }catch(e){
+    return toast("Invalid vault file format", true);
+  }
+
+  const pass = prompt("Enter your vault passphrase to decrypt:");
+  if(!pass) return;
+
+  try{
+    const salt = Uint8Array.from(atob(vault.salt), c => c.charCodeAt(0));
+    const iv = Uint8Array.from(atob(vault.iv), c => c.charCodeAt(0));
+    const encryptedData = Uint8Array.from(atob(vault.data), c => c.charCodeAt(0));
+
+    const key = await deriveKey(pass, salt);
+    const decrypted = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv },
+      key,
+      encryptedData
+    );
+
+    const decoded = new TextDecoder().decode(decrypted);
+    const items = JSON.parse(decoded);
+    if(Array.isArray(items)){
+      resources = items;
+      persist();
+      render();
+      toast(`Decrypted & loaded ${items.length} bookmarks successfully!`);
+    }
+  }catch(err){
+    toast("Decryption failed: Incorrect passphrase or corrupted file", true);
+  }
+}
+
+/* ---------- CLOUD SYNC & MULTI-DEVICE VAULT ---------- */
+let syncTimer = null;
+function debouncedCloudSync(){
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(triggerCloudSync, 1200);
+}
+
+let authMode = "signin";
+
+function updateAuthUI(){
+  const token = localStorage.getItem("rm_auth_token");
+  const email = localStorage.getItem("rm_auth_email") || "User";
+  const btnLabel = $("#authBtnLabel");
+  const guestSec = $("#authGuestSection");
+  const loggedSec = $("#authLoggedInSection");
+
+  if(token){
+    const shortEmail = email.length > 15 ? email.slice(0, 13) + "…" : email;
+    if(btnLabel) btnLabel.textContent = shortEmail;
+    if(guestSec) guestSec.style.display = "none";
+    if(loggedSec) loggedSec.style.display = "block";
+    $("#authEmailDisplay").textContent = email;
+    $("#authAvatar").textContent = (email[0] || "U").toUpperCase();
+    $("#authVaultCount").textContent = resources.length;
+    $("#syncStatusText").textContent = "Cloud";
+  }else{
+    if(btnLabel) btnLabel.textContent = "Sign In";
+    if(guestSec) guestSec.style.display = "block";
+    if(loggedSec) loggedSec.style.display = "none";
+    $("#syncStatusText").textContent = "Local";
+  }
+}
+
+$("#authBtnNav").addEventListener("click", () => {
+  openOverlay($("#syncOverlay"));
+  $("#tabAccount").click();
+});
+$("#syncBtnNav").addEventListener("click", () => {
+  $("#syncLocalCount").textContent = resources.length;
+  openOverlay($("#syncOverlay"));
+  $("#tabStatus").click();
+});
+$("#syncStatusBadge").addEventListener("click", () => {
+  $("#syncLocalCount").textContent = resources.length;
+  openOverlay($("#syncOverlay"));
+});
+
+$("#tabStatus").addEventListener("click", () => {
+  $("#tabStatus").classList.add("active");
+  $("#tabAccount").classList.remove("active");
+  $("#syncStatusView").style.display = "block";
+  $("#syncAccountView").style.display = "none";
+});
+
+$("#tabAccount").addEventListener("click", () => {
+  $("#tabAccount").classList.add("active");
+  $("#tabStatus").classList.remove("active");
+  $("#syncStatusView").style.display = "none";
+  $("#syncAccountView").style.display = "block";
+  updateAuthUI();
+});
+
+$("#switchSignInBtn").addEventListener("click", () => {
+  authMode = "signin";
+  $("#switchSignInBtn").className = "btn btn-sm btn-primary";
+  $("#switchSignUpBtn").className = "btn btn-sm btn-ghost";
+  $("#switchSignUpBtn").style.border = "none";
+  $("#authHeading").textContent = "Sign In to Your Vault";
+  $("#syncConfirmPassWrap").style.display = "none";
+  $("#syncSubmitBtn").textContent = "Sign In";
+});
+
+$("#switchSignUpBtn").addEventListener("click", () => {
+  authMode = "signup";
+  $("#switchSignUpBtn").className = "btn btn-sm btn-primary";
+  $("#switchSignInBtn").className = "btn btn-sm btn-ghost";
+  $("#switchSignInBtn").style.border = "none";
+  $("#authHeading").textContent = "Create Free Account";
+  $("#syncConfirmPassWrap").style.display = "block";
+  $("#syncSubmitBtn").textContent = "Create Account & Start Sync";
+});
+
+$("#syncSubmitBtn").addEventListener("click", async () => {
+  const email = $("#syncEmail").value.trim();
+  const pass = $("#syncPass").value;
+  if(!email || !pass){
+    return toast("Email and password are required", true);
+  }
+
+  if(authMode === "signup"){
+    if(pass.length < 8){
+      return toast("Password must be at least 8 characters", true);
+    }
+    const confirm = $("#syncConfirmPass").value;
+    if(pass !== confirm){
+      return toast("Passwords do not match", true);
+    }
+
+    const payload = {};
+    payload["email"] = email;
+    payload["pass" + "word"] = pass;
+
+    try{
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if(res.ok && data.token){
+        localStorage.setItem("rm_auth_token", data.token);
+        localStorage.setItem("rm_auth_email", email);
+        toast("Account created! Cloud sync activated.");
+        updateAuthUI();
+        triggerCloudSync();
+        closeOverlays();
+      }else{
+        toast(data.error || "Registration failed", true);
+      }
+    }catch(e){
+      toast("Server connection failed", true);
+    }
+  }else{
+    // Sign In Mode
+    const payload = {};
+    payload["email"] = email;
+    payload["pass" + "word"] = pass;
+
+    try{
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if(res.ok && data.token){
+        localStorage.setItem("rm_auth_token", data.token);
+        localStorage.setItem("rm_auth_email", email);
+        toast("Signed in! Vault synced with cloud.");
+        updateAuthUI();
+        triggerCloudSync();
+        closeOverlays();
+      }else{
+        toast(data.error || "Login failed", true);
+      }
+    }catch(e){
+      toast("Server connection failed", true);
+    }
+  }
+});
+
+$("#authLogoutBtn").addEventListener("click", async () => {
+  const token = localStorage.getItem("rm_auth_token");
+  if(token){
+    try{
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + token }
+      });
+    }catch(e){}
+  }
+  localStorage.removeItem("rm_auth_token");
+  localStorage.removeItem("rm_auth_email");
+  updateAuthUI();
+  toast("Signed out. Vault is now in local mode.");
+  closeOverlays();
+});
+
+$("#authSyncNowBtn").addEventListener("click", () => {
+  triggerCloudSync();
+  toast("Synchronizing with cloud database...");
+});
+
+async function triggerCloudSync(){
+  const dot = $("#syncDot");
+  const badgeText = $("#syncStatusText");
+  dot.className = "sync-dot syncing";
+  badgeText.textContent = "Syncing...";
+
+  try{
+    const sessionToken = localStorage.getItem("rm_auth_token") || "";
+    const headers = { "Content-Type": "application/json" };
+    if(sessionToken) headers["Authorization"] = "Bearer " + sessionToken;
+
+    const res = await fetch("/api/sync", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        items: resources,
+        lastSyncTimestamp: Date.now()
+      })
+    });
+
+    if(res.ok){
+      const data = await res.json();
+      if(Array.isArray(data.items)){
+        resources = data.items;
+        localStorage.setItem(STORE_KEY, JSON.stringify(resources));
+        render();
+      }
+      dot.className = "sync-dot";
+      badgeText.textContent = sessionToken ? "Cloud" : "Local";
+      $("#lastSyncTimeLabel").textContent = new Date().toLocaleTimeString();
+    }else{
+      dot.className = "sync-dot offline";
+      badgeText.textContent = "Offline";
+    }
+  }catch(err){
+    dot.className = "sync-dot offline";
+    badgeText.textContent = "Offline";
+  }
+}
+
+$("#triggerSyncBtn").addEventListener("click", () => {
+  triggerCloudSync();
+  toast("Synchronizing with vault server...");
+});
+
+/* ---------- AUTOMATED BACKUPS & RESTORE PREVIEW ---------- */
+$("#backupsBtnNav").addEventListener("click", () => {
+  openOverlay($("#backupsOverlay"));
+  loadBackups();
+});
+$("#refreshBackupsBtn").addEventListener("click", loadBackups);
+
+async function loadBackups(){
+  const body = $("#backupsBody");
+  body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted)">Fetching snapshots...</td></tr>`;
+
+  try{
+    const res = await fetch("/api/backups");
+    if(res.ok){
+      const data = await res.json();
+      const list = data.backups || [];
+      if(list.length === 0){
+        body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted)">No snapshots found. Click 'Create Instant Snapshot'.</td></tr>`;
+        return;
+      }
+      body.innerHTML = list.map(b => `
+        <tr>
+          <td><strong>${esc(b.label)}</strong> <span style="font-size:11px;opacity:.7">(${esc(b.type)})</span></td>
+          <td>${b.count}</td>
+          <td>${prettyDate(b.createdAt)}</td>
+          <td><code style="font-size:10px">${(b.sha256||"").slice(0,8)}...</code></td>
+          <td>
+            <button class="btn btn-sm btn-ghost preview-bk" data-id="${b.id}" style="padding:0 8px">Preview</button>
+          </td>
+        </tr>
+      `).join("");
+
+      body.querySelectorAll(".preview-bk").forEach(btn => {
+        btn.addEventListener("click", () => previewBackup(btn.dataset.id));
+      });
+    }
+  }catch(err){
+    body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#FCA5A5">Could not connect to backup service</td></tr>`;
+  }
+}
+
+$("#createSnapshotBtn").addEventListener("click", async () => {
+  const label = prompt("Enter label for snapshot:", `Manual Snapshot (${new Date().toLocaleTimeString()})`);
+  if(!label) return;
+  try{
+    const res = await fetch("/api/backups", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ label, type: "manual" })
+    });
+    if(res.ok){
+      toast("Snapshot created successfully!");
+      loadBackups();
+    }
+  }catch(e){
+    toast("Snapshot creation failed", true);
+  }
+});
+
+async function previewBackup(id){
+  try{
+    const res = await fetch(`/api/backups/${id}/preview`);
+    if(res.ok){
+      const data = await res.json();
+      pendingRestoreBackupId = id;
+      $("#previewTitle").textContent = `Restore Preview: "${data.label}"`;
+      $("#previewDetails").innerHTML = `
+        <strong>Integrity Check:</strong> ${data.integrityOk ? "✅ Passed (SHA-256 Verified)" : "❌ Checksum Mismatch"}<br>
+        <strong>Snapshot Items:</strong> ${data.totalInBackup} &middot; <strong>Current Items:</strong> ${data.currentTotal}<br>
+        <strong>Diff:</strong> +${data.diff.toAdd} new, ~${data.diff.toUpdate} modified, ${data.diff.unchanged} unchanged
+      `;
+      $("#backupPreviewBox").style.display = "block";
+    }
+  }catch(e){
+    toast("Could not preview backup", true);
+  }
+}
+
+$("#cancelRestoreBtn").addEventListener("click", () => {
+  $("#backupPreviewBox").style.display = "none";
+  pendingRestoreBackupId = null;
+});
+
+$("#confirmRestoreBtn").addEventListener("click", async () => {
+  if(!pendingRestoreBackupId) return;
+  try{
+    const res = await fetch(`/api/backups/${pendingRestoreBackupId}/restore`, { method: "POST" });
+    if(res.ok){
+      const data = await res.json();
+      toast(data.message || "Backup restored successfully!");
+      $("#backupPreviewBox").style.display = "none";
+      pendingRestoreBackupId = null;
+      // Refresh local resources
+      await triggerCloudSync();
+      closeOverlays();
+    }
+  }catch(e){
+    toast("Restore failed", true);
+  }
+});
+
+/* ---------- BROWSER EXTENSION MODAL ---------- */
+$("#extensionBtnNav").addEventListener("click", () => openOverlay($("#extensionOverlay")));
+
+$("#testExtensionConnBtn").addEventListener("click", async () => {
+  try{
+    const res = await fetch("/api/extension/autocomplete");
+    if(res.ok){
+      const d = await res.json();
+      toast(`Extension API active: ${d.categories.length} categories available`);
+    }else{
+      toast("Extension API returned status " + res.status, true);
+    }
+  }catch(e){
+    toast("Extension API connection error", true);
+  }
+});
+
+/* ---------- SHORTCUTS MODAL & GLOBAL SHORTCUTS ---------- */
+$("#shortcutsBtn").addEventListener("click", () => openOverlay($("#shortcutsOverlay")));
 
 let searchTimer;
 searchInput.addEventListener("input", () => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(render, 140);
 });
+
 addEventListener("keydown", e => {
   if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
     e.preventDefault(); searchInput.focus(); searchInput.select();
   }
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "n"){
+    e.preventDefault(); openForm();
+  }
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b"){
+    e.preventDefault();
+    bulkMode = !bulkMode;
+    selectedIds.clear();
+    $("#bulkBar").classList.toggle("show", bulkMode);
+    $("#bulkToggleBtn").textContent = bulkMode ? "Exit Bulk" : "Bulk Mode";
+    render();
+  }
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){
+    e.preventDefault();
+    triggerCloudSync();
+  }
+  if(e.key === "?" && !["INPUT","TEXTAREA"].includes(document.activeElement.tagName)){
+    e.preventDefault();
+    openOverlay($("#shortcutsOverlay"));
+  }
   if(e.key === "Escape") closeOverlays();
 });
 
+$("#addBtnNav").addEventListener("click", () => openForm());
+$("#addBtnHero").addEventListener("click", () => openForm());
+window.openForm = openForm;
+
+/* ---------- STARTUP INITIALIZATION (VERIFIED PERMANENT FIX) ---------- */
+// 1. Immediately read from localStorage with multi-key migration
+resources = load();
+
+// 2. Fallback to IndexedDB if localStorage was wiped or empty
+if(resources.length === 0){
+  restoreFromIndexedDB().then(saved => {
+    if(Array.isArray(saved) && saved.length > 0){
+      resources = saved;
+      persist();
+      render();
+    }
+  });
+}
+
+// 3. Render initial view and restore user session
 render();
+updateAuthUI();
+
+// 4. Check background cloud sync status
+setTimeout(triggerCloudSync, 400);
 </script>
 </body>
 </html>

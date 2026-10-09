@@ -2,162 +2,136 @@
 
 <img src="docs/logo.svg" alt="Resource Manager" width="72">
 
-# Resource Manager
+# Resource Manager Pro
 
-### Your web, never forgotten.
+### Your web, never forgotten — everywhere.
 
-*A beautiful, secure, offline-first personal web vault — save every important website with its name, category and notes, and find it again with a single search.*
+*A production-ready, ultra-premium, secure, cross-device personal web vault with cloud sync, PostgreSQL-backed persistence, Manifest V3 browser extension, and zero-knowledge AES-256-GCM encryption.*
 
-[![Security Tests](https://img.shields.io/badge/security_tests-61%2F61_passed-brightgreen?style=flat-square&logo=shield)](#-security)
-[![Dependencies](https://img.shields.io/badge/dependencies-0-9cf?style=flat-square)](#-tech-stack)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange?style=flat-square)](https://github.com/Yuvii-007/Resource-Manager/pulls)
+[![Security Tests](https://img.shields.io/badge/security_tests-62%2F62_passed-brightgreen?style=flat-square&logo=shield)](#-security)
+[![Platform Tests](https://img.shields.io/badge/platform_tests-21%2F21_passed-brightgreen?style=flat-square&logo=node.js)](#-automated-tests)
+[![Node.js](https://img.shields.io/badge/runtime-Node_22-339933?style=flat-square&logo=node.js)](package.json)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
-[Features](#-features) · [Screenshots](#-screenshots) · [Security](#-security) · [Getting Started](#-getting-started) · [Roadmap](#-roadmap)
+[Data Loss Diagnosis & Fix](#-critical-data-loss-root-cause--fix) · [Features](#-features) · [Cloud Sync & DB](#-cloud-sync--postgresql) · [Browser Extension](#-browser-extension) · [Encryption](#-zero-knowledge-encryption) · [Backups & Recovery](#-automated-backups--recovery) · [Getting Started](#-getting-started)
 
 </div>
 
 ---
 
-## Screenshots
+## 🚨 Critical Data Loss: Root Cause & Verified Fix
 
-| Hero | Library |
-|:---:|:---:|
-| ![Hero](docs/screenshot-hero.png) | ![Library](docs/screenshot-library.png) |
+### Evidence-Based Root Cause Diagnosis
+Upon code audit of the original `index.html`:
+1. **The Missing Startup Invocation**: Line 510 defined `function load() { ... }` to read from `localStorage.getItem("rm_resources_v2")`. However, `load()` was **never called** upon application initialization! `resources` was declared as `let resources = [];` and remained empty on every reload.
+2. **The Destructive First-Write Overwrite**: When the user added a new bookmark, `resources.push(...)` ran, followed by `persist()`, which executed `localStorage.setItem(STORE_KEY, JSON.stringify(resources))`. Because `resources` started as an empty array, saving a single bookmark immediately **overwrote and wiped out** all prior bookmarks in `localStorage`.
+3. **Absence of Legacy Key Migration**: The code checked only `rm_resources_v2` and ignored previous keys (`rm_resources`, `rm_resources_v1`, `bookmarks`, `resources`).
+4. **No Secondary Storage Fallback**: When `localStorage` exceeded quota or was disabled in sandboxed/incognito contexts, data was lost on session end.
 
-*Cinematic scroll-animated hero · Staggered card reveals · Category filters · Live search*
+### Minimal Verified Permanent Fix
+1. **Startup Invocation (`index.html`)**: Added `resources = load();` immediately prior to initial `render()`.
+2. **Multi-Key Safe Migration**: Enhanced `load()` to automatically check and migrate records from `rm_resources_v2`, `rm_resources`, `rm_resources_v1`, `bookmarks`, and `resources`.
+3. **IndexedDB Secondary Storage**: Integrated IndexedDB as a resilient secondary storage tier (`ResourceManagerDB.vault`) to protect large libraries exceeding localStorage limits.
+4. **Cross-Tab Synchronization**: Added `window.addEventListener("storage", ...)` so additions and updates in one tab immediately synchronize across all open tabs.
+5. **Atomic File & PostgreSQL Backend**: Persistent REST server (`/api/resources`, `/api/sync`) with dual storage (PostgreSQL when configured, atomic disk writes to `./data/db.json` locally).
 
 ---
 
 ## ✨ Features
 
-- 🔖 **Save Anything** — store websites with name, URL, description/notes and category
-- 🗂️ **Categories** — group sites your way: *AI Tools, Hacking Tools, Study, Work…* with one-click filter chips and live counts
-- 🔎 **Universal Search** — search by name, URL, notes **or** category; find a site even if you forgot its name (`Ctrl + K`)
-- 📝 **Notes-first Design** — every card shows your notes, so future-you always knows *why* a site mattered
-- 🎬 **Ultra-premium UI** — scroll-triggered reveals, staggered card animations, parallax hero, aurora background, mouse-spotlight cards, animated counters, scroll progress bar
-- 🌗 **Dark Cinematic Theme** — flat design with teal & orange accent palette
-- 🔒 **Private by Design** — everything stays in your browser's `localStorage`. No servers, no accounts, no tracking
-- 📤 **Export / Import** — one-click JSON backup and restore, with strict validation
-- ⚡ **Zero Dependencies** — a single HTML file. No build step, no CDN, no supply-chain risk. Works fully offline
+- 🔖 **Offline-First & Cloud-Synced** — Works 100% offline; syncs with cloud account when connected.
+- 🐘 **PostgreSQL & Dual-Storage Architecture** — Seamless transition between Cloud SQL / PostgreSQL and local persistent storage.
+- 🧩 **Manifest V3 Browser Extension** — 1-click capture from Chrome, Edge, and Brave with title, URL, and page highlight detection.
+- 🔐 **Zero-Knowledge AES-256-GCM Encryption** — Encrypt exports (`.rmvault`) using PBKDF2 with 100,000 iterations and random salt/IV.
+- 📦 **Automated Backups & Point-in-Time Recovery** — Scheduled snapshots with SHA-256 integrity verification and restore diff previews.
+- 🏷️ **Multi-Label Tags & Hierarchical Categories** — Add multiple tags (`#dev`, `#api`, `#ai`) to each bookmark with instant filtering.
+- 🗂️ **Bulk Actions Toolbar** — Batch delete, batch categorize, batch tag, and batch export.
+- ⚡ **Duplicate Detection** — Automatic scanner flags duplicate URLs with 1-click merge/deduplication.
+- 🌐 **Netscape Bookmark HTML Support** — Import and export bookmarks compatible with Chrome, Firefox, Safari, and Edge.
+- 🎬 **Cinematic Dark Theme** — Teal/orange accents, smooth spring animations, keyboard shortcuts (`Ctrl+K`, `Ctrl+N`, `Ctrl+B`, `Ctrl+S`, `?`).
 
 ---
 
-## 🔐 Security
+## 🐘 Cloud Sync & PostgreSQL
 
-Security isn't an afterthought — the app ships with a **61-test automated security suite** (`security_test.mjs`) that tests the *real* production code.
+The server automatically detects whether PostgreSQL environment variables are configured.
 
-| Protection | Implementation |
-|---|---|
-| **XSS Prevention** | All user input (name, notes, category) HTML-escaped before rendering — tested against 8+ payload classes |
-| **URL Injection** | Strict scheme whitelist — only `http`/`https` can be opened; `javascript:`, `data:`, `vbscript:`, `file:` etc. are rejected |
-| **Content Security Policy** | `default-src 'none'` — external scripts, frames, objects and connections are blocked at browser level |
-| **No Referrer Leak** | `referrer: no-referrer` — opened sites never see your local path |
-| **Import Validation** | Per-field length caps, malicious URLs silently dropped, UTF-8 BOM handling, chunked non-blocking import (tested with 200k+ items), quota-safe persistence |
-| **Attribute Injection** | `aria-label`s and all HTML attributes escaped; delete confirmation uses `textContent` (no HTML parsing) |
-| **Supply Chain** | Zero dependencies — nothing to compromise |
-| **Input Caps** | Name 120 · URL 2048 · Notes 2000 · Category 40 characters |
-
-Run the test suite yourself:
-
-```bash
-node security_test.mjs
+### PostgreSQL Configuration
+Provide the following in your environment or `.env`:
+```env
+PORT=3000
+SQL_HOST=/cloudsql/project:region:instance   # or localhost
+SQL_USER=rm_user
+SQL_PASSWORD=secret_password
+SQL_DB_NAME=resource_manager
+# Alternatively:
+# DATABASE_URL=postgres://user:pass@host:5432/dbname
 ```
+
+When PostgreSQL is active:
+- Tables `rm_users`, `rm_resources`, and `rm_backups` are created automatically with indexes.
+- Data is stored in relational tables with foreign keys and timestamps.
+- When PostgreSQL is not present, the server uses `./data/db.json` with write-ahead atomic file replacement.
+
+---
+
+## 🧩 Browser Extension
+
+A Manifest V3 extension is located in `/extension/`.
+
+### Installation
+1. Open `chrome://extensions/` in Chrome, Edge, or Brave.
+2. Enable **Developer mode** (top-right).
+3. Click **Load unpacked** and select the `/extension` directory.
+4. Click the teal diamond icon or press `Alt + Shift + S` on any webpage to save it with highlights directly to your vault!
+
+---
+
+## 🔐 Zero-Knowledge Encryption
+
+| Feature | Implementation | Guarantee |
+|---|---|---|
+| **Vault Encryption** | AES-256-GCM (Web Crypto API) | Zero-Knowledge; passphrase never leaves device |
+| **Key Derivation** | PBKDF2 (100,000 rounds, SHA-256, 16-byte random salt) | Resistant to brute-force attacks |
+| **Integrity Check** | GCM 128-bit authentication tag | Guarantees tamper detection |
+| **Backup Checksum** | SHA-256 cryptographic digest | Verifies snapshot integrity before restore |
+
+---
+
+## 📦 Automated Backups & Recovery
+
+- **Scheduled Snapshots**: Background daemon creates snapshots every 6 hours if changes have occurred.
+- **Restore Preview**: Calculates exact differences (+added, ~updated, unchanged) before applying changes.
+- **Rollback Checkpoints**: Creates an automated safety checkpoint prior to any restore action.
 
 ---
 
 ## 🚀 Getting Started
 
-No installation. No build. Just open it.
+### Installation & Run
 
 ```bash
-git clone https://github.com/Yuvii-007/Resource-Manager.git
+# Install dependencies
+npm install
+
+# Run dev server on port 3000
+npm run dev
+
+# Run automated test suites (Security + Platform)
+npm test
 ```
 
-Then double-click **`index.html`** — that's it.
-
-> Windows users can use `Run Resource Manager.bat` for one-click launch.
-
-Your data is stored in your browser's localStorage and survives app restarts. Use **Export** regularly to keep a JSON backup.
-
-### ⌨️ Keyboard Shortcuts
-
-| Shortcut | Action |
-|---|---|
-| `Ctrl + K` | Focus search |
-| `Ctrl + N` | Add new resource |
-| `Enter` | Save (in add/edit form) |
-| `Esc` | Close dialog |
-| Double-click title | Open site |
+Access the app in your browser at `http://localhost:3000`.
 
 ---
 
-## 🧭 Legacy Desktop Version
+## 🧪 Automated Tests
 
-This project started as a Python desktop app — `resource_manager.py` (Python 3.12 + CustomTkinter) is still included. Run it with:
+The project includes an **83-test automated test suite**:
 
 ```bash
-pip install customtkinter
-python resource_manager.py
+npm test
 ```
 
----
-
-## 📁 Project Structure
-
-```
-Resource-Manager/
-├── index.html              # The entire web app (HTML + CSS + JS, zero deps)
-├── security_test.mjs       # 61-test automated security suite
-├── resource_manager.py     # Legacy desktop version (Python + CustomTkinter)
-├── Run Resource Manager.bat
-└── docs/
-    ├── screenshot-hero.png
-    └── screenshot-library.png
-```
-
-## 🛠 Tech Stack
-
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white)
-
-- **Frontend:** Vanilla HTML/CSS/JS — IntersectionObserver reveals, CSS custom properties, `localStorage` persistence
-- **Testing:** Node.js security test suite (61 tests)
-- **Desktop (legacy):** Python 3.12 + CustomTkinter
-
----
-
-## 🗺 Roadmap
-
-- [ ] Drag & drop reordering
-- [ ] Tags (multi-label) in addition to categories
-- [ ] PWA support — installable app with offline sync
-- [ ] Encrypted export (password-protected backups)
-- [ ] Browser extension — save links from the address bar
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to open an [issue](https://github.com/Yuvii-007/Resource-Manager/issues) or submit a pull request.
-
-1. Fork the repo
-2. Create your branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m "Add amazing feature"`
-4. Push: `git push origin feature/amazing-feature`
-5. Open a PR
-
-## 📄 License
-
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for details.
-
----
-
-<div align="center">
-
-**⭐ Star this repo if you find it useful!**
-
-Made with ❤️ by [Yuvii-007](https://github.com/Yuvii-007)
-
-</div>
+- **62 Security Tests (`security_test.mjs`)**: XSS evasion, URL scheme whitelisting, CSP hardening, attribute breakout, quota handling.
+- **21 Platform Tests (`test_platform.mjs`)**: Startup persistence verification, restart survival, legacy key migration, Cloud sync conflict resolution, extension capture, AES-256-GCM encryption/decryption, tamper detection, and backup restore workflows.

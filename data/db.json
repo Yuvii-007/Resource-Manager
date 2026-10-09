@@ -1,0 +1,456 @@
+{
+  "users": [
+    {
+      "id": "usr_mv0n9n2l2b808ba3",
+      "email": "test_1791530943384@resourcemanager.internal",
+      "passwordHash": "$2b$10$LBqzg0JhV8lpGiR50KR2PuiDYr.7Tgm./O1etLmiCAjR9XNYggcGm",
+      "createdAt": "2026-10-09T07:29:03.501Z",
+      "updatedAt": "2026-10-09T07:29:03.501Z"
+    },
+    {
+      "id": "usr_mv0n9vzn03f22884",
+      "email": "test_1791530954933@resourcemanager.internal",
+      "passwordHash": "$2b$10$0IKIu1LSmN5QdpZuwCf6nO50cZr/EgL1VvrwcDec.9fm40XgRloQW",
+      "createdAt": "2026-10-09T07:29:15.060Z",
+      "updatedAt": "2026-10-09T07:29:15.060Z"
+    },
+    {
+      "id": "usr_mv0nb637ff2a4e41",
+      "email": "test_1791531014687@resourcemanager.internal",
+      "passwordHash": "$2b$10$ML8Jbgw3Jwk3FWlmj4gUnOuizHId9PUO4sBpGCIDQTLSBgtaMDJyi",
+      "createdAt": "2026-10-09T07:30:14.803Z",
+      "updatedAt": "2026-10-09T07:30:14.803Z"
+    },
+    {
+      "id": "usr_mv0nrwiw5646c940",
+      "email": "test_1791531795440@resourcemanager.internal",
+      "passwordHash": "$2b$10$Ov3DHqlGnhIYSnB27O7ftuG9Cw8Z0789RhbaF7G7StxN5RQgArXqy",
+      "createdAt": "2026-10-09T07:43:15.560Z",
+      "updatedAt": "2026-10-09T07:43:15.560Z"
+    },
+    {
+      "id": "usr_mv0sqnokda23ad13",
+      "email": "test_1791540135403@resourcemanager.internal",
+      "passwordHash": "$2b$10$300hC2Iayu418sgTGF7Fh.xe2T1Gc0Sq4RSGpLUF2Kt5d3Au/4/0W",
+      "createdAt": "2026-10-09T10:02:15.525Z",
+      "updatedAt": "2026-10-09T10:02:15.525Z"
+    },
+    {
+      "id": "usr_mv0thjyz2474f259",
+      "email": "ys6313091@gmail.com",
+      "passwordHash": "$2b$10$bQEyMgVQ8/g.sJptWeFjF.BtUYDxlLVk2aX0sIta7FRrJVWYv0.o2",
+      "createdAt": "2026-10-09T10:23:10.427Z",
+      "updatedAt": "2026-10-09T10:23:10.427Z"
+    },
+    {
+      "id": "usr_mv0tpfd2cabeb7aa",
+      "email": "test_1791541757571@resourcemanager.internal",
+      "passwordHash": "$2b$10$JrN4DdIhqvR6/XUjrgQX0O1FoDDVm9tKS.ci3Ntbci.mhgKxGrBq6",
+      "createdAt": "2026-10-09T10:29:17.702Z",
+      "updatedAt": "2026-10-09T10:29:17.702Z"
+    }
+  ],
+  "resources": [
+    {
+      "id": "sync1",
+      "userId": "usr_mv0tpfd2cabeb7aa",
+      "name": "Updated by Client Device",
+      "url": "https://v2.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": false,
+      "created": "2026-10-09T10:29:17.810Z",
+      "updated": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "res_mv0n9n5e078c122b",
+      "userId": "usr_mv0n9n2l2b808ba3",
+      "name": "Captured via Extension",
+      "url": "https://captured-site.org",
+      "notes": "Selected text from webpage",
+      "category": "Extension",
+      "tags": [
+        "web-capture"
+      ],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": false,
+      "created": "2026-10-09T07:29:03.602Z",
+      "updated": "2026-10-09T07:29:03.602Z"
+    },
+    {
+      "id": "res_mv0n9n61641c6867",
+      "userId": "usr_mv0n9n2l2b808ba3",
+      "name": "Site A",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T07:29:03.625Z",
+      "updated": "2026-10-09T07:29:03.626Z"
+    },
+    {
+      "id": "res_mv0n9n61ad9bf062",
+      "userId": "usr_mv0n9n2l2b808ba3",
+      "name": "Site B",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T07:29:03.625Z",
+      "updated": "2026-10-09T07:29:03.626Z"
+    },
+    {
+      "id": "res_mv0n9w2k7efcaea0",
+      "userId": "usr_mv0n9vzn03f22884",
+      "name": "Captured via Extension",
+      "url": "https://captured-site.org",
+      "notes": "Selected text from webpage",
+      "category": "Extension",
+      "tags": [
+        "web-capture"
+      ],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": false,
+      "created": "2026-10-09T07:29:15.164Z",
+      "updated": "2026-10-09T07:29:15.164Z"
+    },
+    {
+      "id": "res_mv0n9w39a85553f9",
+      "userId": "usr_mv0n9vzn03f22884",
+      "name": "Site A",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T07:29:15.189Z",
+      "updated": "2026-10-09T07:29:15.190Z"
+    },
+    {
+      "id": "res_mv0n9w3acc1873c1",
+      "userId": "usr_mv0n9vzn03f22884",
+      "name": "Site B",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T07:29:15.190Z",
+      "updated": "2026-10-09T07:29:15.191Z"
+    },
+    {
+      "id": "res_mv0nb65w2c6cf88e",
+      "userId": "usr_mv0nb637ff2a4e41",
+      "name": "Captured via Extension",
+      "url": "https://captured-site.org",
+      "notes": "Selected text from webpage",
+      "category": "Extension",
+      "tags": [
+        "web-capture"
+      ],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": false,
+      "created": "2026-10-09T07:30:14.900Z",
+      "updated": "2026-10-09T07:30:14.900Z"
+    },
+    {
+      "id": "res_mv0nb66l82d56d7e",
+      "userId": "usr_mv0nb637ff2a4e41",
+      "name": "Site A",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T07:30:14.925Z",
+      "updated": "2026-10-09T07:30:14.926Z"
+    },
+    {
+      "id": "res_mv0nb66l1a037bad",
+      "userId": "usr_mv0nb637ff2a4e41",
+      "name": "Site B",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T07:30:14.925Z",
+      "updated": "2026-10-09T07:30:14.926Z"
+    },
+    {
+      "id": "res_mv0nrwlo9f66e78c",
+      "userId": "usr_mv0nrwiw5646c940",
+      "name": "Captured via Extension",
+      "url": "https://captured-site.org",
+      "notes": "Selected text from webpage",
+      "category": "Extension",
+      "tags": [
+        "web-capture"
+      ],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": false,
+      "created": "2026-10-09T07:43:15.660Z",
+      "updated": "2026-10-09T07:43:15.660Z"
+    },
+    {
+      "id": "res_mv0nrwmcb09ccfc1",
+      "userId": "usr_mv0nrwiw5646c940",
+      "name": "Site A",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T07:43:15.684Z",
+      "updated": "2026-10-09T07:43:15.685Z"
+    },
+    {
+      "id": "res_mv0nrwmcb3fc8052",
+      "userId": "usr_mv0nrwiw5646c940",
+      "name": "Site B",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T07:43:15.684Z",
+      "updated": "2026-10-09T07:43:15.685Z"
+    },
+    {
+      "id": "res_mv0sqnrke75c128b",
+      "userId": "usr_mv0sqnokda23ad13",
+      "name": "Captured via Extension",
+      "url": "https://captured-site.org",
+      "notes": "Selected text from webpage",
+      "category": "Extension",
+      "tags": [
+        "web-capture"
+      ],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": false,
+      "created": "2026-10-09T10:02:15.632Z",
+      "updated": "2026-10-09T10:02:15.632Z"
+    },
+    {
+      "id": "res_mv0sqns9b82b42db",
+      "userId": "usr_mv0sqnokda23ad13",
+      "name": "Site A",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T10:02:15.657Z",
+      "updated": "2026-10-09T10:02:15.658Z"
+    },
+    {
+      "id": "res_mv0sqns99d695823",
+      "userId": "usr_mv0sqnokda23ad13",
+      "name": "Site B",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T10:02:15.657Z",
+      "updated": "2026-10-09T10:02:15.659Z"
+    },
+    {
+      "id": "res_mv0tpfg3b01c72c1",
+      "userId": "usr_mv0tpfd2cabeb7aa",
+      "name": "Captured via Extension",
+      "url": "https://captured-site.org",
+      "notes": "Selected text from webpage",
+      "category": "Extension",
+      "tags": [
+        "web-capture"
+      ],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": false,
+      "created": "2026-10-09T10:29:17.811Z",
+      "updated": "2026-10-09T10:29:17.811Z"
+    },
+    {
+      "id": "res_mv0tpfgr03111b2d",
+      "userId": "usr_mv0tpfd2cabeb7aa",
+      "name": "Site A",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T10:29:17.835Z",
+      "updated": "2026-10-09T10:29:17.838Z"
+    },
+    {
+      "id": "res_mv0tpfgt82866b89",
+      "userId": "usr_mv0tpfd2cabeb7aa",
+      "name": "Site B",
+      "url": "https://duplicate-url.com",
+      "notes": "",
+      "category": "",
+      "tags": [],
+      "orderIndex": 0,
+      "isFavorite": false,
+      "isDeleted": true,
+      "created": "2026-10-09T10:29:17.837Z",
+      "updated": "2026-10-09T10:29:17.838Z"
+    }
+  ],
+  "backups": [
+    {
+      "id": "bk_mv0tpfgqb92806",
+      "userId": "usr_mv0tpfd2cabeb7aa",
+      "label": "Auto-Checkpoint before restoring \"Test Snapshot\"",
+      "type": "checkpoint",
+      "sha256": "9708d2f010d94f438472123df96b1d3c2323aa43f596b5e33006773aa5f85479",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0tpfd2cabeb7aa\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T10:29:17.810Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0tpfg3b01c72c1\",\n    \"userId\": \"usr_mv0tpfd2cabeb7aa\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T10:29:17.811Z\",\n    \"updated\": \"2026-10-09T10:29:17.811Z\"\n  }\n]",
+      "createdAt": "2026-10-09T10:29:17.834Z"
+    },
+    {
+      "id": "bk_mv0tpfgp88592b",
+      "userId": "usr_mv0tpfd2cabeb7aa",
+      "label": "Test Snapshot",
+      "type": "manual",
+      "sha256": "9708d2f010d94f438472123df96b1d3c2323aa43f596b5e33006773aa5f85479",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0tpfd2cabeb7aa\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T10:29:17.810Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0tpfg3b01c72c1\",\n    \"userId\": \"usr_mv0tpfd2cabeb7aa\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T10:29:17.811Z\",\n    \"updated\": \"2026-10-09T10:29:17.811Z\"\n  }\n]",
+      "createdAt": "2026-10-09T10:29:17.833Z"
+    },
+    {
+      "id": "bk_mv0sqns87709d0",
+      "userId": "usr_mv0sqnokda23ad13",
+      "label": "Auto-Checkpoint before restoring \"Test Snapshot\"",
+      "type": "checkpoint",
+      "sha256": "73b4dcb639b11ce6a012f671df090d36c843edce322dde8ec56acf492731a904",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0sqnokda23ad13\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T10:02:15.632Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0sqnrke75c128b\",\n    \"userId\": \"usr_mv0sqnokda23ad13\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T10:02:15.632Z\",\n    \"updated\": \"2026-10-09T10:02:15.632Z\"\n  }\n]",
+      "createdAt": "2026-10-09T10:02:15.656Z"
+    },
+    {
+      "id": "bk_mv0sqns7c07814",
+      "userId": "usr_mv0sqnokda23ad13",
+      "label": "Test Snapshot",
+      "type": "manual",
+      "sha256": "73b4dcb639b11ce6a012f671df090d36c843edce322dde8ec56acf492731a904",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0sqnokda23ad13\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T10:02:15.632Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0sqnrke75c128b\",\n    \"userId\": \"usr_mv0sqnokda23ad13\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T10:02:15.632Z\",\n    \"updated\": \"2026-10-09T10:02:15.632Z\"\n  }\n]",
+      "createdAt": "2026-10-09T10:02:15.655Z"
+    },
+    {
+      "id": "bk_mv0nrwmbf30a48",
+      "userId": "usr_mv0nrwiw5646c940",
+      "label": "Auto-Checkpoint before restoring \"Test Snapshot\"",
+      "type": "checkpoint",
+      "sha256": "fc18d572d394d45e2fc06d8a86b483a5eb7c2df754e0bdc72d8447f7d4917b32",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0nrwiw5646c940\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:43:15.660Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0nrwlo9f66e78c\",\n    \"userId\": \"usr_mv0nrwiw5646c940\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:43:15.660Z\",\n    \"updated\": \"2026-10-09T07:43:15.660Z\"\n  }\n]",
+      "createdAt": "2026-10-09T07:43:15.683Z"
+    },
+    {
+      "id": "bk_mv0nrwma8ce836",
+      "userId": "usr_mv0nrwiw5646c940",
+      "label": "Test Snapshot",
+      "type": "manual",
+      "sha256": "fc18d572d394d45e2fc06d8a86b483a5eb7c2df754e0bdc72d8447f7d4917b32",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0nrwiw5646c940\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:43:15.660Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0nrwlo9f66e78c\",\n    \"userId\": \"usr_mv0nrwiw5646c940\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:43:15.660Z\",\n    \"updated\": \"2026-10-09T07:43:15.660Z\"\n  }\n]",
+      "createdAt": "2026-10-09T07:43:15.682Z"
+    },
+    {
+      "id": "bk_mv0nb66k7df4ba",
+      "userId": "usr_mv0nb637ff2a4e41",
+      "label": "Auto-Checkpoint before restoring \"Test Snapshot\"",
+      "type": "checkpoint",
+      "sha256": "af83b200f4872e9842236ff35e9ff255e7c48608540ab85d2716b9da4e0ef390",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0nb637ff2a4e41\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:30:14.900Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0nb65w2c6cf88e\",\n    \"userId\": \"usr_mv0nb637ff2a4e41\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:30:14.900Z\",\n    \"updated\": \"2026-10-09T07:30:14.900Z\"\n  }\n]",
+      "createdAt": "2026-10-09T07:30:14.924Z"
+    },
+    {
+      "id": "bk_mv0nb66ja8ac0b",
+      "userId": "usr_mv0nb637ff2a4e41",
+      "label": "Test Snapshot",
+      "type": "manual",
+      "sha256": "af83b200f4872e9842236ff35e9ff255e7c48608540ab85d2716b9da4e0ef390",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0nb637ff2a4e41\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:30:14.900Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0nb65w2c6cf88e\",\n    \"userId\": \"usr_mv0nb637ff2a4e41\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:30:14.900Z\",\n    \"updated\": \"2026-10-09T07:30:14.900Z\"\n  }\n]",
+      "createdAt": "2026-10-09T07:30:14.923Z"
+    },
+    {
+      "id": "bk_mv0n9w38a29792",
+      "userId": "usr_mv0n9vzn03f22884",
+      "label": "Auto-Checkpoint before restoring \"Test Snapshot\"",
+      "type": "checkpoint",
+      "sha256": "24c59889305ea07c5c0a35c83b92d778b201e0a63a109ef3a4c3c30cb2c98a75",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0n9vzn03f22884\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:29:15.164Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0n9w2k7efcaea0\",\n    \"userId\": \"usr_mv0n9vzn03f22884\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:29:15.164Z\",\n    \"updated\": \"2026-10-09T07:29:15.164Z\"\n  }\n]",
+      "createdAt": "2026-10-09T07:29:15.188Z"
+    },
+    {
+      "id": "bk_mv0n9w37886a18",
+      "userId": "usr_mv0n9vzn03f22884",
+      "label": "Test Snapshot",
+      "type": "manual",
+      "sha256": "24c59889305ea07c5c0a35c83b92d778b201e0a63a109ef3a4c3c30cb2c98a75",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0n9vzn03f22884\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:29:15.164Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0n9w2k7efcaea0\",\n    \"userId\": \"usr_mv0n9vzn03f22884\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:29:15.164Z\",\n    \"updated\": \"2026-10-09T07:29:15.164Z\"\n  }\n]",
+      "createdAt": "2026-10-09T07:29:15.187Z"
+    },
+    {
+      "id": "bk_mv0n9n607060d3",
+      "userId": "usr_mv0n9n2l2b808ba3",
+      "label": "Auto-Checkpoint before restoring \"Test Snapshot\"",
+      "type": "checkpoint",
+      "sha256": "209053aaacf40aecbe802756fe93d05525fb5807206326545765aa43002b1d9e",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0n9n2l2b808ba3\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:29:03.601Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0n9n5e078c122b\",\n    \"userId\": \"usr_mv0n9n2l2b808ba3\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:29:03.602Z\",\n    \"updated\": \"2026-10-09T07:29:03.602Z\"\n  }\n]",
+      "createdAt": "2026-10-09T07:29:03.624Z"
+    },
+    {
+      "id": "bk_mv0n9n5z0073d6",
+      "userId": "usr_mv0n9n2l2b808ba3",
+      "label": "Test Snapshot",
+      "type": "manual",
+      "sha256": "209053aaacf40aecbe802756fe93d05525fb5807206326545765aa43002b1d9e",
+      "count": 2,
+      "payload": "[\n  {\n    \"id\": \"sync1\",\n    \"userId\": \"usr_mv0n9n2l2b808ba3\",\n    \"name\": \"Updated by Client Device\",\n    \"url\": \"https://v2.com\",\n    \"notes\": \"\",\n    \"category\": \"\",\n    \"tags\": [],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:29:03.601Z\",\n    \"updated\": \"2026-10-01T00:00:00.000Z\"\n  },\n  {\n    \"id\": \"res_mv0n9n5e078c122b\",\n    \"userId\": \"usr_mv0n9n2l2b808ba3\",\n    \"name\": \"Captured via Extension\",\n    \"url\": \"https://captured-site.org\",\n    \"notes\": \"Selected text from webpage\",\n    \"category\": \"Extension\",\n    \"tags\": [\n      \"web-capture\"\n    ],\n    \"orderIndex\": 0,\n    \"isFavorite\": false,\n    \"isDeleted\": false,\n    \"created\": \"2026-10-09T07:29:03.602Z\",\n    \"updated\": \"2026-10-09T07:29:03.602Z\"\n  }\n]",
+      "createdAt": "2026-10-09T07:29:03.624Z"
+    }
+  ],
+  "syncEvents": []
+}

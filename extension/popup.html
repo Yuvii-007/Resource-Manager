@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Save to Resource Manager</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="#14B8A6" width="18" height="18"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg>
+      <span>Resource Manager</span>
+    </div>
+    <span class="status-badge" id="statusBadge">Connected</span>
+  </div>
+
+  <form id="saveForm">
+    <div class="field">
+      <label for="title">Title</label>
+      <input type="text" id="title" required maxlength="120" placeholder="Website title">
+    </div>
+
+    <div class="field">
+      <label for="url">URL</label>
+      <input type="url" id="url" required maxlength="2048" placeholder="https://...">
+    </div>
+
+    <div class="row">
+      <div class="field col">
+        <label for="category">Category</label>
+        <input type="text" id="category" list="catList" maxlength="40" placeholder="e.g. AI, Dev, Work">
+        <datalist id="catList"></datalist>
+      </div>
+      <div class="field col">
+        <label for="tags">Tags (comma-separated)</label>
+        <input type="text" id="tags" placeholder="e.g. docs, api, ref">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="notes">Notes / Selected Text</label>
+      <textarea id="notes" rows="3" placeholder="Key insights or highlight from page..."></textarea>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary" id="saveBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Save to Vault
+      </button>
+    </div>
+  </form>
+
+  <div class="footer">
+    <a href="#" id="openApp">Open Web Vault &rarr;</a>
+    <span id="savedIndicator"></span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

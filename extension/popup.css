@@ -1,0 +1,144 @@
+:root {
+  --bg: #060B10;
+  --card: #0D1620;
+  --border: rgba(153, 246, 228, 0.15);
+  --border-hi: rgba(20, 184, 166, 0.4);
+  --text: #E9F5F2;
+  --muted: #8CA3AD;
+  --primary: #0D9488;
+  --primary-hi: #14B8A6;
+  --on-primary: #03130F;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  width: 360px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 14px;
+  font-size: 13px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.status-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--primary-hi);
+  background: rgba(20, 184, 166, 0.12);
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+
+.field {
+  margin-bottom: 10px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+.col { flex: 1; }
+
+label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+input, textarea {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--primary-hi);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 54px;
+}
+
+.actions {
+  margin-top: 12px;
+}
+
+.btn {
+  width: 100%;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn:hover {
+  background: var(--primary-hi);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.footer {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.footer a {
+  color: var(--primary-hi);
+  text-decoration: none;
+}
+.footer a:hover {
+  text-decoration: underline;
+}
+
+#savedIndicator {
+  font-weight: 600;
+  color: var(--primary-hi);
+}
